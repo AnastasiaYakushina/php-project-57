@@ -10,3 +10,6 @@ lint:
 
 test:
 	php artisan test
+
+test-coverage:
+	php artisan test --coverage-clover=coverage.xml

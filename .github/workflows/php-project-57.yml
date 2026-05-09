@@ -16,6 +16,7 @@ jobs:
         with:
           php-version: '8.4'
           extensions: mbstring, xml, ctype, iconv, pdo_sqlite
+          coverage: pcov
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -34,9 +35,12 @@ jobs:
         run: make lint
 
       - name: Run tests
-        run: make test
-      
+        run: test-coverage
+
       - name: SonarCloud Scan
         uses: SonarSource/sonarqube-scan-action@fd88b7d7ccbaefd23d8f36f73b59db7a3d246602
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          args: >
+            -Dsonar.php.coverage.reportPaths=coverage.xml
