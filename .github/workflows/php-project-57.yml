@@ -26,11 +26,6 @@ jobs:
       - name: Install dependencies
         run: make install
 
-      - name: Build frontend assets
-        run: |
-          npm ci
-          npm run build
-
       - name: Run linter
         run: make lint
 

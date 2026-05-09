@@ -1,5 +1,7 @@
 install:
 	composer install
+	npm ci
+	npm run build 
 	cp -n .env.example .env || true
 	php artisan key:generate --ansi
 	touch database/database.sqlite
