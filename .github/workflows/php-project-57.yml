@@ -35,7 +35,7 @@ jobs:
         run: make lint
 
       - name: Run tests
-        run: test-coverage
+        run: make test-coverage
 
       - name: SonarCloud Scan
         uses: SonarSource/sonarqube-scan-action@fd88b7d7ccbaefd23d8f36f73b59db7a3d246602
