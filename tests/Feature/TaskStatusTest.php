@@ -26,7 +26,7 @@ class TaskStatusTest extends TestCase
     public function testTaskStatusesIndexAsGuest(): void
     {
         $response = $this->get('/task_statuses');
-        $response->assertOk(); 
+        $response->assertOk();
         $response->assertDontSee('Создать');
         $response->assertDontSee('Изменить');
         $response->assertDontSee('Удалить');
@@ -42,10 +42,9 @@ class TaskStatusTest extends TestCase
             ['delete', 'task_statuses/1', []],
         ];
 
-    foreach ($routes as [$method, $url, $data]) {
-        
-        $response = $this->$method($url, $data);
-        $response->assertRedirect('/login');
+        foreach ($routes as [$method, $url, $data]) {
+            $response = $this->$method($url, $data);
+            $response->assertRedirect('/login');
         }
     }
 
@@ -101,7 +100,7 @@ class TaskStatusTest extends TestCase
         $user = User::factory()->create();
         $data = ['name' => ''];
         $response = $this->actingAs($user)
-            ->from('/task_statuses/create') 
+            ->from('/task_statuses/create')
             ->post('task_statuses', $data);
         $response->assertRedirect('/task_statuses/create');
         $response->assertSessionHasErrors(['name' => 'Это обязательное поле']);
