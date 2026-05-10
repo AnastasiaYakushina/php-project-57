@@ -5,7 +5,7 @@ install:
 	cp -n .env.example .env || true
 	php artisan key:generate --ansi
 	touch database/database.sqlite
-	php artisan migrate --force
+	php artisan migrate --force --seed
 
 lint:
 	composer exec phpcs -- --standard=PSR12 routes tests app
