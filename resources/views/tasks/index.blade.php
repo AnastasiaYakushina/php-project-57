@@ -1,10 +1,10 @@
 <x-app-layout>
     <h2>{{ __('Задачи') }}</h2>
-    
+
     @auth
-        <div>
-            <a href="{{ route('tasks.create') }}">{{ __('Создать задачу') }}</a>
-        </div>
+    <div>
+        <a href="{{ route('tasks.create') }}">{{ __('Создать задачу') }}</a>
+    </div>
     @endauth
 
     <table>
@@ -19,28 +19,30 @@
         </thead>
         <tbody>
             @foreach ($tasks as $task)
-                <tr>
-                    <td>{{ $task->name }}</td>
-                    <td>{{ $task->status->name }}</td>
-                    <td>{{ $task->executor }}</td>
-                    <td>{{ $task->created }}</td>
-                    <td>
-                        @auth
-                            <a href="{{ route('tasks.edit', $task) }}">{{ __('Изменить') }}</a>
-                        
-                            @can('delete', $task)
-                                <form action="{{ route('tasks.destroy', $task) }}" method="POST" style="display:inline;">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" onclick="return confirm('{{ __('Вы уверены?') }}')">
-                                    {{ __('Удалить') }}
-                                    </button>
-                                    </form>
-                            @endcan
+            <tr>
+                <td>
+                    <a href="{{ route('tasks.show', $task) }}">{{ $task->name }}</a>
+                </td>
+                <td>{{ $task->status->name }}</td>
+                <td>{{ $task->executor?->name }}</td>
+                <td>{{ $task->created_at->format('d.m.Y') }}</td>
+                <td>
+                    @auth
+                    <a href="{{ route('tasks.edit', $task) }}">{{ __('Изменить') }}</a>
 
-                        @endauth
-                    </td>
-                </tr>
+                    @can('delete', $task)
+                    <form action="{{ route('tasks.destroy', $task) }}" method="POST" style="display:inline;">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" onclick="return confirm('{{ __('Вы уверены?') }}')">
+                            {{ __('Удалить') }}
+                        </button>
+                    </form>
+                    @endcan
+
+                    @endauth
+                </td>
+            </tr>
             @endforeach
         </tbody>
     </table>

@@ -95,6 +95,16 @@ class TaskStatusTest extends TestCase
         $this->assertNull(TaskStatus::all()->first());
     }
 
+    public function testTaskStatusesWithTaskNonDestroy(): void
+    {
+        $user = User::factory()->create();
+        $status = TaskStatus::factory()->create();
+        $task = Task::factory()->create(['status_id' => $status->id]);
+        $response = $this->actingAs($user)->delete("task_statuses/{$status->id}");
+        $response->assertRedirect('/task_statuses');
+        $this->assertDatabaseHas('task_statuses', ['id' => $status->id]);
+    }
+
     public function testTaskStatusesCorrectValidation(): void
     {
         $user = User::factory()->create();
@@ -116,6 +126,4 @@ class TaskStatusTest extends TestCase
         $response->assertRedirect('/task_statuses/create');
         $response->assertSessionHasErrors(['name' => 'Статус с таким именем уже существует']);
     }
-
-    // дописать тест на невозможность удаления статуса, если к нему привязана задача
 }

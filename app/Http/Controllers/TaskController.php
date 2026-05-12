@@ -3,10 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Models\Task;
+use App\Models\TaskStatus;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class TaskController extends Controller
 {
+    use AuthorizesRequests;
+
     /**
      * Display a listing of the resource.
      */
@@ -21,7 +26,10 @@ class TaskController extends Controller
      */
     public function create()
     {
-        //
+        $task = new Task();
+        $taskStatuses = TaskStatus::all();
+        $users = User::all();
+        return view('tasks.create', compact('task', 'taskStatuses', 'users'));
     }
 
     /**
@@ -29,7 +37,24 @@ class TaskController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $data = $request->validate([
+            'name' => 'required',
+            'status_id' => 'required|exists:task_statuses,id',
+            'description' => 'nullable|string',
+            'assigned_to_id' => 'nullable|exists:users,id',
+        ], [
+            'name.required' => 'Это обязательное поле',
+            'status_id.required' => 'Это обязательное поле',
+        ]);
+
+        $task = new Task();
+        $task->fill($data);
+        $task->created_by_id = auth()->id();
+        $task->save();
+
+        flash('Задача успешно создана')->success();
+        return redirect()
+            ->route('tasks.index');
     }
 
     /**
@@ -37,7 +62,7 @@ class TaskController extends Controller
      */
     public function show(Task $task)
     {
-        //
+        return view('tasks.show', compact('task'));
     }
 
     /**
@@ -45,7 +70,9 @@ class TaskController extends Controller
      */
     public function edit(Task $task)
     {
-        //
+        $taskStatuses = TaskStatus::all();
+        $users = User::all();
+        return view('tasks.edit', compact('task', 'taskStatuses', 'users'));
     }
 
     /**
@@ -53,7 +80,22 @@ class TaskController extends Controller
      */
     public function update(Request $request, Task $task)
     {
-        //
+        $data = $request->validate([
+            'name' => 'required',
+            'status_id' => 'required|exists:task_statuses,id',
+            'description' => 'nullable|string',
+            'assigned_to_id' => 'nullable|exists:users,id',
+        ], [
+            'name.required' => 'Это обязательное поле',
+            'status_id.required' => 'Это обязательное поле',
+        ]);
+
+        $task->fill($data);
+        $task->save();
+
+        flash('Задача успешно изменена')->success();
+        return redirect()
+            ->route('tasks.index');
     }
 
     /**
@@ -61,6 +103,10 @@ class TaskController extends Controller
      */
     public function destroy(Task $task)
     {
-        //
+        $this->authorize('delete', $task);
+        $task->delete();
+
+        flash('Задача успешно удалена')->success();
+        return redirect()->route('tasks.index');
     }
 }
