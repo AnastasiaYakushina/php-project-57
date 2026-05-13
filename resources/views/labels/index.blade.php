@@ -31,13 +31,16 @@
                                 @auth
                                 <a href="{{ route('labels.edit', $label) }}" class="inline-block text-xs uppercase tracking-wider px-3 py-1.5 text-white bg-emerald-800 hover:bg-emerald-900 rounded-none font-medium transition-colors">{{ __('Изменить') }}</a>
 
-                                <form action="{{ route('labels.destroy', $label) }}" method="POST" class="m-0 p-0">
+                                <form id="delete-label-form-{{ $label->id }}" action="{{ route('labels.destroy', $label) }}" method="POST" class="hidden">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" onclick="return confirm('{{ __('Вы уверены?') }}')" class="inline-block text-xs uppercase tracking-wider px-3 py-1.5 text-white bg-emerald-800 hover:bg-emerald-900 rounded-none font-medium cursor-pointer transition-colors align-baseline text-left border-none">
-                                        {{ __('Удалить') }}
-                                    </button>
                                 </form>
+
+                                <a href="{{ route('labels.destroy', $label) }}"
+                                    onclick="event.preventDefault(); if(confirm('{{ __('Вы уверены?') }}')) { document.getElementById('delete-label-form-{{ $label->id }}').submit(); }"
+                                    class="inline-block text-xs uppercase tracking-wider px-3 py-1.5 text-white bg-emerald-800 hover:bg-emerald-900 rounded-none font-medium cursor-pointer transition-colors align-baseline text-left">
+                                    {{ __('Удалить') }}
+                                </a>
                                 @endauth
                             </div>
                         </td>

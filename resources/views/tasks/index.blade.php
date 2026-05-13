@@ -71,13 +71,16 @@
                                 <a href="{{ route('tasks.edit', $task) }}" class="inline-block text-xs uppercase tracking-wider px-3 py-1.5 text-white bg-emerald-800 hover:bg-emerald-900 rounded-none font-medium transition-colors">{{ __('Изменить') }}</a>
 
                                 @can('delete', $task)
-                                <form action="{{ route('tasks.destroy', $task) }}" method="POST" class="m-0 p-0">
+                                <form id="delete-task-form-{{ $task->id }}" action="{{ route('tasks.destroy', $task) }}" method="POST" class="hidden">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" onclick="return confirm('{{ __('Вы уверены?') }}')" class="inline-block text-xs uppercase tracking-wider px-3 py-1.5 text-white bg-emerald-800 hover:bg-emerald-900 rounded-none font-medium cursor-pointer transition-colors align-baseline text-left border-none">
-                                        {{ __('Удалить') }}
-                                    </button>
                                 </form>
+
+                                <a href="{{ route('tasks.destroy', $task) }}"
+                                    onclick="event.preventDefault(); if(confirm('{{ __('Вы уверены?') }}')) { document.getElementById('delete-task-form-{{ $task->id }}').submit(); }"
+                                    class="inline-block text-xs uppercase tracking-wider px-3 py-1.5 text-white bg-emerald-800 hover:bg-emerald-900 rounded-none font-medium cursor-pointer transition-colors">
+                                    {{ __('Удалить') }}
+                                </a>
                                 @endcan
                                 @endauth
                             </div>

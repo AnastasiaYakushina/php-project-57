@@ -29,13 +29,16 @@
                                 @auth
                                 <a href="{{ route('task_statuses.edit', $status) }}" class="inline-block text-xs px-3 py-1.5 text-white bg-emerald-800 hover:bg-emerald-900 font-medium transition-colors">{{ __('Изменить') }}</a>
 
-                                <form action="{{ route('task_statuses.destroy', $status) }}" method="POST" class="m-0 p-0">
+                                <form id="delete-status-form-{{ $status->id }}" action="{{ route('task_statuses.destroy', $status) }}" method="POST" class="hidden">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" onclick="return confirm('{{ __('Вы уверены?') }}')" class="inline-block text-xs px-3 py-1.5 text-white bg-emerald-800 hover:bg-emerald-900 font-medium cursor-pointer transition-colors border-none text-left">
-                                        {{ __('Удалить') }}
-                                    </button>
                                 </form>
+
+                                <a href="{{ route('task_statuses.destroy', $status) }}"
+                                    onclick="event.preventDefault(); if(confirm('{{ __('Вы уверены?') }}')) { document.getElementById('delete-status-form-{{ $status->id }}').submit(); }"
+                                    class="inline-block text-xs px-3 py-1.5 text-white bg-emerald-800 hover:bg-emerald-900 font-medium cursor-pointer transition-colors text-left">
+                                    {{ __('Удалить') }}
+                                </a>
                                 @endauth
                             </div>
                         </td>
