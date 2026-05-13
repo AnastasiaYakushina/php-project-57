@@ -16,6 +16,7 @@
                     <tr class="bg-[#faf9f6] text-sm tracking-wide text-gray-700 border-b border-gray-300">
                         <th scope="col" class="px-4 py-3 font-medium border-r border-gray-300 text-left">{{ __('ID') }}</th>
                         <th scope="col" class="px-4 py-3 font-medium border-r border-gray-300 text-left">{{ __('Название') }}</th>
+                        <th scope="col" class="px-4 py-3 font-medium border-r border-gray-300 text-left">{{ __('Описание') }}</th>
                         <th scope="col" class="px-4 py-3 font-medium text-left">{{ __('Действия') }}</th>
                     </tr>
                 </thead>
@@ -24,12 +25,13 @@
                     <tr class="hover:bg-[#faf9f6]">
                         <td class="px-4 py-4 border-r border-gray-300 text-left">{{ $label->id }}</td>
                         <td class="px-4 py-4 border-r border-gray-300 text-left">{{ $label->name }}</td>
+                        <td class="px-4 py-4 border-r border-gray-300 text-left">{{ $label->description }}</td>
                         <td class="px-4 py-4 text-left">
                             <div class="flex items-center gap-2 justify-start">
                                 @auth
                                 <a href="{{ route('labels.edit', $label) }}" class="inline-block text-xs uppercase tracking-wider px-3 py-1.5 text-white bg-emerald-800 hover:bg-emerald-900 rounded-none font-medium transition-colors">{{ __('Изменить') }}</a>
 
-                                <form action="{{ route('labels.destroy', $label) }}" method="POST" class="inline-block m-0 p-0">
+                                <form action="{{ route('labels.destroy', $label) }}" method="POST" class="m-0 p-0">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" onclick="return confirm('{{ __('Вы уверены?') }}')" class="inline-block text-xs uppercase tracking-wider px-3 py-1.5 text-white bg-emerald-800 hover:bg-emerald-900 rounded-none font-medium cursor-pointer transition-colors align-baseline text-left border-none">
@@ -39,6 +41,7 @@
                                 @endauth
                             </div>
                         </td>
+
                     </tr>
                     @endforeach
                 </tbody>

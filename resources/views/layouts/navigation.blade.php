@@ -23,11 +23,11 @@
 
             <div class="hidden sm:flex sm:items-center gap-8">
                 @auth
-                <form method="POST" action="{{ route('logout') }}" class="m-0 p-0">
+                <form method="POST" action="{{ route('logout') }}" class="m-0 p-0 inline">
                     @csrf
-                    <a href="{{ route('logout') }}" onclick="event.preventDefault(); this.closest('form').submit();" class="inline-flex items-center text-lg font-normal text-white hover:text-gray-200 transition-colors cursor-pointer">
+                    <button type="submit" class="inline-flex items-center text-lg font-normal text-white hover:text-gray-200 transition-colors cursor-pointer bg-transparent border-none p-0">
                         {{ __('Выход') }}
-                    </a>
+                    </button>
                 </form>
                 @else
                 <a href="{{ route('login') }}" class="inline-flex items-center text-lg font-normal text-white hover:text-gray-200 transition-colors">
