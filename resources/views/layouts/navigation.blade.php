@@ -24,12 +24,32 @@
 
             <div class="hidden sm:flex items-center justify-end min-w-[200px] gap-8 z-10">
                 @auth
-                <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" class="inline-flex items-center text-lg font-normal text-white hover:text-gray-200 transition-colors cursor-pointer">
-                    {{ __('Выход') }}
-                </a>
-                <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-                    @csrf
-                </form>
+                <!-- Дропдаун для авторизованного пользователя -->
+                <x-dropdown align="right" width="48">
+                    <x-slot name="trigger">
+                        <button class="inline-flex items-center px-3 py-2 border border-transparent text-base font-medium rounded-md text-white bg-emerald-700 hover:bg-emerald-600 focus:outline-none transition ease-in-out duration-150">
+                            <div>{{ Auth::user()->name }}</div>
+                            <div class="ms-1">
+                                <svg class="fill-current h-4 w-4" xmlns="w3.org" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                        </button>
+                    </x-slot>
+
+                    <x-slot name="content">
+                        <!-- Отдельная чистая форма аутентификации -->
+                        <form method="POST" action="{{ route('logout') }}" id="logout-form-desktop">
+                            @csrf
+                        </form>
+
+                        <!-- Чистая ссылка для клика Dusk -->
+                        <x-dropdown-link :href="route('logout')"
+                            onclick="event.preventDefault(); document.getElementById('logout-form-desktop').submit();">
+                            {{ __('Выход') }}
+                        </x-dropdown-link>
+                    </x-slot>
+                </x-dropdown>
                 @else
                 <a href="{{ route('login') }}" class="inline-flex items-center text-lg font-normal text-white hover:text-gray-200 transition-colors whitespace-nowrap">
                     {{ __('Войти') }}
