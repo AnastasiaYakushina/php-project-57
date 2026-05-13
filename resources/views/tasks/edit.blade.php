@@ -56,6 +56,17 @@
         </div>
 
         <div>
+            <label for="labels">{{ __('Метки') }}</label>
+            <select name="labels[]" id="labels" multiple>
+                @foreach($labels as $label)
+                <option value="{{ $label->id }}" {{ in_array($label->id, old('labels', $task->labels->pluck('id')->all())) ? 'selected' : '' }}>
+                    {{ $label->name }}
+                </option>
+                @endforeach
+            </select>
+        </div>
+
+        <div>
             <button type="submit">{{ __('Обновить') }}</button>
         </div>
     </form>

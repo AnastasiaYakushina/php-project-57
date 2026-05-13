@@ -12,6 +12,17 @@
 
         <p><strong>{{ __('Исполнитель') }}:</strong> {{ $task->executor?->name ?? '-' }}</p>
 
+        <p>
+            <strong>{{ __('Метки') }}:</strong>
+            @if($task->labels->isEmpty())
+            {{ __('') }}
+            @else
+            @foreach($task->labels as $label)
+            <span>{{ $label->name }}</span>{{ !$loop->last ? ',' : '' }}
+            @endforeach
+            @endif
+        </p>
+
         <p><strong>{{ __('Дата создания') }}:</strong> {{ $task->created_at->format('d.m.Y') }}</p>
     </div>
 

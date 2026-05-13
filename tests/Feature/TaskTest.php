@@ -7,6 +7,7 @@ use Tests\TestCase;
 use App\Models\User;
 use App\Models\TaskStatus;
 use App\Models\Task;
+use App\Models\Label;
 
 class TaskTest extends TestCase
 {
@@ -81,11 +82,14 @@ class TaskTest extends TestCase
     public function testTaskShow(): void
     {
         $user = User::factory()->create();
+        $label = Label::factory()->create(['name' => 'Срочно']);
         $task = Task::factory()->create(['description' => 'Интересное описание интересной задачи']);
+        $task->labels()->attach($label->id);
         $response = $this->actingAs($user)->get("/tasks/{$task->id}");
         $response->assertOk();
         $response->assertSee('Описание');
         $response->assertSee('Интересное описание интересной задачи');
+        $response->assertSee('Срочно');
     }
 
     public function testTaskCreate(): void

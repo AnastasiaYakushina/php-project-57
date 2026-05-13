@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Task;
 use App\Models\TaskStatus;
 use App\Models\User;
+use App\Models\Label;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
@@ -28,8 +29,9 @@ class TaskController extends Controller
     {
         $task = new Task();
         $taskStatuses = TaskStatus::all();
+        $labels = Label::all();
         $users = User::all();
-        return view('tasks.create', compact('task', 'taskStatuses', 'users'));
+        return view('tasks.create', compact('task', 'taskStatuses', 'labels', 'users'));
     }
 
     /**
@@ -42,6 +44,8 @@ class TaskController extends Controller
             'status_id' => 'required|exists:task_statuses,id',
             'description' => 'nullable|string',
             'assigned_to_id' => 'nullable|exists:users,id',
+            'labels' => 'nullable|array',
+            'labels.*' => 'exists:labels,id',
         ], [
             'name.required' => 'Это обязательное поле',
             'status_id.required' => 'Это обязательное поле',
@@ -51,6 +55,8 @@ class TaskController extends Controller
         $task->fill($data);
         $task->created_by_id = auth()->id();
         $task->save();
+
+        $task->labels()->sync($request->input('labels', []));
 
         flash('Задача успешно создана')->success();
         return redirect()
@@ -72,7 +78,8 @@ class TaskController extends Controller
     {
         $taskStatuses = TaskStatus::all();
         $users = User::all();
-        return view('tasks.edit', compact('task', 'taskStatuses', 'users'));
+        $labels = Label::all();
+        return view('tasks.edit', compact('task', 'taskStatuses', 'users', 'labels'));
     }
 
     /**
@@ -85,6 +92,8 @@ class TaskController extends Controller
             'status_id' => 'required|exists:task_statuses,id',
             'description' => 'nullable|string',
             'assigned_to_id' => 'nullable|exists:users,id',
+            'labels' => 'nullable|array',
+            'labels.*' => 'exists:labels,id',
         ], [
             'name.required' => 'Это обязательное поле',
             'status_id.required' => 'Это обязательное поле',
@@ -92,6 +101,8 @@ class TaskController extends Controller
 
         $task->fill($data);
         $task->save();
+
+        $task->labels()->sync($request->input('labels', []));
 
         flash('Задача успешно изменена')->success();
         return redirect()
