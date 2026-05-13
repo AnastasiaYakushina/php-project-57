@@ -184,4 +184,32 @@ class TaskTest extends TestCase
             session('errors')->first('name')
         );
     }
+
+    public function testTaskFilters(): void
+    {
+        $creator = User::factory()->create();
+        $executor = User::factory()->create();
+        $status = TaskStatus::factory()->create();
+
+        Task::factory()->create([
+            'name' => 'Нужная задача',
+            'status_id' => $status->id,
+            'created_by_id' => $creator->id,
+            'assigned_to_id' => $executor->id,
+        ]);
+
+        Task::factory()->create(['name' => 'Лишняя задача']);
+
+        $response = $this->actingAs($creator)->get('/tasks?' . http_build_query([
+            'filter' => [
+                'status_id' => $status->id,
+                'created_by_id' => $creator->id,
+                'assigned_to_id' => $executor->id,
+            ]
+        ]));
+
+        $response->assertOk();
+        $response->assertSee('Нужная задача');
+        $response->assertDontSee('Лишняя задача');
+    }
 }
