@@ -34,7 +34,7 @@
                     {{ __('Войти') }}
                 </a>
                 <a href="{{ route('register') }}" class="inline-flex items-center justify-center px-4 py-2 text-base font-medium text-emerald-800 bg-white hover:bg-emerald-50 rounded-md transition-colors">
-                    {{ __('Зарегистрироваться') }}
+                    {{ __('Зарегистрировать') }}
                 </a>
                 @endauth
             </div>
@@ -78,7 +78,7 @@
                     {{ __('Войти') }}
                 </a>
                 <a href="{{ route('register') }}" class="block pl-4 py-2 text-base font-medium text-emerald-100 hover:bg-emerald-700">
-                    {{ __('Зарегистрироваться') }}
+                    {{ __('Зарегистрировать') }}
                 </a>
             </div>
             @endauth

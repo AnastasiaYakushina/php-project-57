@@ -37,7 +37,7 @@
                 </a>
 
                 <button type="submit" class="inline-block text-xs px-4 py-2 text-white bg-emerald-800 hover:bg-emerald-900 rounded-none font-medium cursor-pointer transition-colors border-none text-center">
-                    {{ __('Зарегистрироваться') }}
+                    {{ __('Зарегистрировать') }}
                 </button>
             </div>
         </form>
