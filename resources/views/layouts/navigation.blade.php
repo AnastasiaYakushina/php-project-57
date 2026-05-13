@@ -24,11 +24,8 @@
 
             <div class="hidden sm:flex sm:items-center space-x-4">
                 @auth
-                <form method="POST" action="{{ route('logout') }}" id="logout-form-desktop" style="display: none;">
-                    @csrf
-                </form>
                 <a href="{{ route('logout') }}"
-                    onclick="event.preventDefault(); document.getElementById('logout-form-desktop').submit();"
+                    onclick="event.preventDefault(); document.getElementById('logout-form-global-desktop').submit();"
                     class="text-base font-medium text-emerald-100 hover:text-white transition-colors cursor-pointer">
                     {{ __('Выход') }}
                 </a>
@@ -69,11 +66,8 @@
         <div class="pt-4 pb-1 border-t border-emerald-900">
             @auth
             <div class="space-y-1">
-                <form method="POST" action="{{ route('logout') }}" id="logout-form-mobile" style="display: none;">
-                    @csrf
-                </form>
                 <a href="{{ route('logout') }}"
-                    onclick="event.preventDefault(); document.getElementById('logout-form-mobile').submit();"
+                    onclick="event.preventDefault(); document.getElementById('logout-form-global-mobile').submit();"
                     class="block pl-4 py-2 text-base font-medium text-emerald-100 hover:bg-emerald-700">
                     {{ __('Выход') }}
                 </a>
@@ -91,3 +85,10 @@
         </div>
     </div>
 </nav>
+
+<form id="logout-form-global-desktop" action="{{ route('logout') }}" method="POST" style="display: none;">
+    @csrf
+</form>
+<form id="logout-form-global-mobile" action="{{ route('logout') }}" method="POST" style="display: none;">
+    @csrf
+</form>
