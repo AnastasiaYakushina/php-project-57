@@ -1,95 +1,66 @@
-<nav x-data="{ open: false }">
-    <div>
-        <div>
-            <div>
-                <div>
-                    <a href="{{ route('dashboard') }}">
+<nav x-data="{ open: false }" class="w-full bg-emerald-800 text-white shadow-none">
+    <div class="w-full px-6">
+        <div class="flex justify-between h-16">
+            <div class="flex items-center">
+                <div class="flex-shrink-0 flex items-center">
+                    <a href="{{ route('tasks.index') }}" class="text-xl font-medium tracking-tight hover:text-gray-200 transition-colors">
                         {{ __('Менеджер задач') }}
                     </a>
                 </div>
-
-                <div>
-                    <x-nav-link :href="route('tasks.index')" :active="request()->routeIs('tasks.index')">
-                        {{ __('Задачи') }}
-                    </x-nav-link>
-                    <x-nav-link :href="route('task_statuses.index')" :active="request()->routeIs('task_statuses.index')">
-                        {{ __('Статусы') }}
-                    </x-nav-link>
-                    <x-nav-link :href="route('labels.index')" :active="request()->routeIs('labels.index')">
-                        {{ __('Метки') }}
-                    </x-nav-link>
-                </div>
             </div>
 
-            <div>
-                <x-dropdown>
-                    <x-slot name="trigger">
-                        <button>
-                            <div>{{ Auth::user()?->name }}</div>
-
-                            <div>
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                </svg>
-                            </div>
-                        </button>
-                    </x-slot>
-
-                    <x-slot name="content">
-                        <x-dropdown-link :href="route('profile.edit')">
-                            {{ __('Profile') }}
-                        </x-dropdown-link>
-
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-                            <x-dropdown-link :href="route('logout')"
-                                onclick="event.preventDefault(); this.closest('form').submit();"
-                                @keydown.enter="event.preventDefault(); this.closest('form').submit();">
-                                {{ __('Log Out') }}
-                            </x-dropdown-link>
-                        </form>
-                    </x-slot>
-                </x-dropdown>
+            <div class="hidden sm:flex items-center h-full ml-12 mr-auto">
+                <a href="{{ route('tasks.index') }}" class="inline-flex items-center text-lg font-normal text-white border-b-2 {{ request()->routeIs('tasks.*') ? 'border-white' : 'border-transparent' }} pb-1.5 px-6 h-fit hover:text-gray-200 transition-colors">
+                    {{ __('Задачи') }}
+                </a>
+                <a href="{{ route('task_statuses.index') }}" class="inline-flex items-center text-lg font-normal text-white border-b-2 {{ request()->routeIs('task_statuses.*') ? 'border-white' : 'border-transparent' }} pb-1.5 px-6 h-fit hover:text-gray-200 transition-colors">
+                    {{ __('Статусы') }}
+                </a>
+                <a href="{{ route('labels.index') }}" class="inline-flex items-center text-lg font-normal text-white border-b-2 {{ request()->routeIs('labels.*') ? 'border-white' : 'border-transparent' }} pb-1.5 px-6 h-fit hover:text-gray-200 transition-colors">
+                    {{ __('Метки') }}
+                </a>
             </div>
 
-            <div>
-                <button @click="open = ! open">
-                    <svg viewBox="0 0 24 24">
-                        <path :class="{ 'hidden': open, 'inline-flex': !open }" d="M4 6h16M4 12h16M4 18h16" />
-                        <path :class="{ 'hidden': !open, 'inline-flex': open }" d="M6 18L18 6M6 6l12 12" />
+            <div class="hidden sm:flex sm:items-center gap-8">
+                @auth
+                <form method="POST" action="{{ route('logout') }}" class="m-0 p-0">
+                    @csrf
+                    <a href="{{ route('logout') }}" onclick="event.preventDefault(); this.closest('form').submit();" class="inline-flex items-center text-lg font-normal text-white hover:text-gray-200 transition-colors cursor-pointer">
+                        {{ __('Выход') }}
+                    </a>
+                </form>
+                @else
+                <a href="{{ route('login') }}" class="inline-flex items-center text-lg font-normal text-white hover:text-gray-200 transition-colors">
+                    {{ __('Войти') }}
+                </a>
+                <a href="{{ route('register') }}" class="inline-flex items-center text-lg font-normal text-white hover:text-gray-200 transition-colors">
+                    {{ __('Зарегистрироваться') }}
+                </a>
+                @endauth
+            </div>
+
+            <div class="flex items-center sm:hidden">
+                <button @click="open = ! open" class="inline-flex items-center justify-center p-2 text-white hover:text-gray-200 focus:outline-none transition-colors">
+                    <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
+                        <path :class="{ 'hidden': open, 'inline-flex': !open }" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        <path :class="{ 'hidden': !open, 'inline-flex': open }" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
                 </button>
             </div>
         </div>
     </div>
 
-    <div :class="{ 'block': open, 'hidden': !open }">
-        <div>
-            <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                {{ __('Dashboard') }}
-            </x-responsive-nav-link>
-        </div>
-
-        <div>
-            <div>
-                <div>{{ Auth::user()?->name }}</div>
-                <div>{{ Auth::user()?->email }}</div>
-            </div>
-
-            <div>
-                <x-responsive-nav-link :href="route('profile.edit')">
-                    {{ __('Profile') }}
-                </x-responsive-nav-link>
-
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-                    <x-responsive-nav-link :href="route('logout')"
-                        onclick="event.preventDefault(); this.closest('form').submit();"
-                        @keydown.enter="event.preventDefault(); this.closest('form').submit();">
-                        {{ __('Log Out') }}
-                    </x-responsive-nav-link>
-                </form>
-            </div>
+    <div :class="{ 'block': open, 'hidden': !open }" class="hidden sm:hidden border-t border-emerald-900 bg-emerald-800">
+        <div class="pt-2 pb-3 space-y-1">
+            <a href="{{ route('tasks.index') }}" class="block pl-4 py-2 text-lg font-normal text-white {{ request()->routeIs('tasks.*') ? 'bg-emerald-900 border-l-4 border-white' : '' }}">
+                {{ __('Задачи') }}
+            </a>
+            <a href="{{ route('task_statuses.index') }}" class="block pl-4 py-2 text-lg font-normal text-white {{ request()->routeIs('task_statuses.*') ? 'bg-emerald-900 border-l-4 border-white' : '' }}">
+                {{ __('Статусы') }}
+            </a>
+            <a href="{{ route('labels.index') }}" class="block pl-4 py-2 text-lg font-normal text-white {{ request()->routeIs('labels.*') ? 'bg-emerald-900 border-l-4 border-white' : '' }}">
+                {{ __('Метки') }}
+            </a>
         </div>
     </div>
 </nav>

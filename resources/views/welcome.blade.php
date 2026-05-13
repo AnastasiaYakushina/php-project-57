@@ -1,32 +1,10 @@
-<!DOCTYPE html>
-<html lang="ru">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Проект на Хекслете</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-</head>
-
-<body>
-    <div>
-
-        @if (Route::has('login'))
-        <div>
-            @auth
-            <a href="{{ url('/dashboard') }}">Панель управления</a>
-            @else
-            <a href="{{ route('login') }}">Вход</a>
-
-            @if (Route::has('register'))
-            <a href="{{ route('register') }}">Регистрация</a>
-            @endif
-            @endauth
-        </div>
-        @endif
-
-        <div>
-        </div>
-</body>
-
-</html>
+<x-app-layout>
+    <div class="w-full px-6 py-12 bg-white text-black min-h-screen">
+        <h1 style="font-size: 2.5rem; font-weight: 700; line-height: 1.1;" class="tracking-tight mb-6 text-black">
+            {{ __('Привет от Хекслета!') }}
+        </h1>
+        <h3 class="text-xl font-normal text-gray-400 tracking-wide">
+            {{ __('Это простой менеджер задач на Laravel') }}
+        </h3>
+    </div>
+</x-app-layout>

@@ -16,15 +16,7 @@
 
 <body>
     <div>
-        <div>
-            <a href="/">
-                <x-application-logo />
-            </a>
-        </div>
-
-        <div>
-            {{ $slot }}
-        </div>
+        {{ $slot }}
     </div>
 </body>
 

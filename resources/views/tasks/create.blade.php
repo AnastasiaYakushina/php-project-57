@@ -1,73 +1,68 @@
 <x-app-layout>
-    <h2>{{ __('Создать задачу') }}</h2>
+    <div class="max-w-2xl mx-auto px-6 py-8 bg-white text-black min-h-screen">
+        <h2 class="text-xl font-normal tracking-tight mb-8 text-black">{{ __('Создать задачу') }}</h2>
 
-    <form action="{{ route('tasks.store') }}" method="POST">
-        @csrf
+        {{ html()->form('POST', route('tasks.store'))->class('space-y-6')->open() }}
 
-        <div>
-            <label for="name">{{ __('Название') }}</label>
-            <input type="text" name="name" id="name" value="{{ old('name') }}">
+        <div class="flex flex-col gap-2">
+            {{ html()->label(__('Название'), 'name')->class('text-sm font-medium text-gray-700') }}
+            {{ html()->text('name')->value(old('name'))->class('w-full px-3 py-2 text-sm bg-white border border-gray-300 rounded-none focus:outline-none focus:border-emerald-800 focus:ring-0 text-black') }}
 
             @error('name')
-            <span>{{ $message }}</span>
+            <span class="text-xs text-red-600 mt-1">{{ $message }}</span>
             @enderror
         </div>
 
-        <div>
-            <label for="description">{{ __('Описание') }}</label>
-            <textarea name="description" id="description">{{ old('description') }}</textarea>
+        <div class="flex flex-col gap-2">
+            {{ html()->label(__('Описание'), 'description')->class('text-sm font-medium text-gray-700') }}
+            {{ html()->textarea('description')->value(old('description'))->class('w-full px-3 py-2 text-sm bg-white border border-gray-300 rounded-none focus:outline-none focus:border-emerald-800 focus:ring-0 text-black min-h-[100px]') }}
 
             @error('description')
-            <span>{{ $message }}</span>
+            <span class="text-xs text-red-600 mt-1">{{ $message }}</span>
             @enderror
         </div>
 
-        <div>
-            <label for="status_id">{{ __('Статус') }}</label>
-            <select name="status_id" id="status_id">
-                <option value="">-- {{ __('Выберите статус') }} --</option>
-                @foreach($taskStatuses as $status)
-                <option value="{{ $status->id }}" {{ old('status_id') == $status->id ? 'selected' : '' }}>
-                    {{ $status->name }}
-                </option>
-                @endforeach
-            </select>
+        <div class="flex flex-col gap-2">
+            {{ html()->label(__('Статус'), 'status_id')->class('text-sm font-medium text-gray-700') }}
+            {{ html()->select('status_id', $taskStatuses->pluck('name', 'id'))
+                    ->placeholder('-- ' . __('Выберите статус') . ' --')
+                    ->value(old('status_id'))
+                    ->class('w-full px-3 py-2 text-sm bg-white border border-gray-300 rounded-none focus:outline-none focus:border-emerald-800 focus:ring-0 text-black cursor-pointer') }}
 
             @error('status_id')
-            <span>{{ $message }}</span>
+            <span class="text-xs text-red-600 mt-1">{{ $message }}</span>
             @enderror
         </div>
 
-        <div>
-            <label for="assigned_to_id">{{ __('Исполнитель') }}</label>
-            <select name="assigned_to_id" id="assigned_to_id">
-                <option value="">-- {{ __('Выберите исполнителя') }} --</option>
-                @foreach($users as $user)
-                <option value="{{ $user->id }}" {{ old('assigned_to_id') == $user->id ? 'selected' : '' }}>
-                    {{ $user->name }}
-                </option>
-                @endforeach
-            </select>
+        <div class="flex flex-col gap-2">
+            {{ html()->label(__('Исполнитель'), 'assigned_to_id')->class('text-sm font-medium text-gray-700') }}
+            {{ html()->select('assigned_to_id', $users->pluck('name', 'id'))
+                    ->placeholder('-- ' . __('Выберите исполнителя') . ' --')
+                    ->value(old('assigned_to_id'))
+                    ->class('w-full px-3 py-2 text-sm bg-white border border-gray-300 rounded-none focus:outline-none focus:border-emerald-800 focus:ring-0 text-black cursor-pointer') }}
 
             @error('assigned_to_id')
-            <span>{{ $message }}</span>
+            <span class="text-xs text-red-600 mt-1">{{ $message }}</span>
             @enderror
         </div>
 
-        <div>
-            <label for="labels">{{ __('Метки') }}</label>
-            <select name="labels[]" id="labels" multiple>
+        <div class="flex flex-col gap-2">
+            <span class="text-sm font-medium text-gray-700">{{ __('Метки') }}</span>
+            <div class="grid grid-cols-2 gap-3 pt-1">
                 @foreach($labels as $label)
-                <option value="{{ $label->id }}" {{ in_array($label->id, old('labels', [])) ? 'selected' : '' }}>
-                    {{ $label->name }}
-                </option>
+                <label class="inline-flex items-center text-sm cursor-pointer select-none">
+                    {{ html()->checkbox('labels[]', in_array($label->id, old('labels', [])), $label->id)
+                        ->class('w-4 h-4 text-emerald-800 border-gray-300 rounded-none focus:ring-0 focus:ring-offset-0 cursor-pointer') }}
+                    <span class="ml-2 text-black">{{ $label->name }}</span>
+                </label>
                 @endforeach
-            </select>
+            </div>
         </div>
 
-
-        <div>
-            <button type="submit">{{ __('Создать') }}</button>
+        <div class="pt-4">
+            {{ html()->submit(__('Создать'))->class('inline-block text-xs px-4 py-2 text-white bg-emerald-800 hover:bg-emerald-900 rounded-none font-medium cursor-pointer transition-colors border-none text-center') }}
         </div>
-    </form>
+
+        {{ html()->form()->close() }}
+    </div>
 </x-app-layout>

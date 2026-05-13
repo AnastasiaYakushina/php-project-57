@@ -1,86 +1,90 @@
 <x-app-layout>
-    <h2>{{ __('Задачи') }}</h2>
+    <div class="w-full px-6 py-8 bg-white text-black min-h-screen">
+        <h2 class="text-xl font-normal tracking-tight mb-8 text-black">{{ __('Задачи') }}</h2>
 
-    @auth
-    <div>
-        <a href="{{ route('tasks.create') }}">{{ __('Создать задачу') }}</a>
-    </div>
-    @endauth
-
-    <form action="{{ route('tasks.index') }}" method="GET" style="margin-bottom: 20px; margin-top: 20px;">
-        <div style="display: flex; gap: 10px;">
-            <select name="filter[status_id]">
-                <option value="">{{ __('Статус') }}</option>
-                @foreach($taskStatuses as $status)
-                <option value="{{ $status->id }}" {{ request('filter.status_id') == $status->id ? 'selected' : '' }}>
-                    {{ $status->name }}
-                </option>
-                @endforeach
-            </select>
-
-            <select name="filter[created_by_id]">
-                <option value="">{{ __('Автор') }}</option>
-                @foreach($users as $user)
-                <option value="{{ $user->id }}" {{ request('filter.created_by_id') == $user->id ? 'selected' : '' }}>
-                    {{ $user->name }}
-                </option>
-                @endforeach
-            </select>
-
-            <select name="filter[assigned_to_id]">
-                <option value="">{{ __('Исполнитель') }}</option>
-                @foreach($users as $user)
-                <option value="{{ $user->id }}" {{ request('filter.assigned_to_id') == $user->id ? 'selected' : '' }}>
-                    {{ $user->name }}
-                </option>
-                @endforeach
-            </select>
-
-            <button type="submit">{{ __('Применить') }}</button>
+        @auth
+        <div class="mb-6">
+            <a href="{{ route('tasks.create') }}" class="inline-block text-xs uppercase tracking-wider px-4 py-2 text-white bg-emerald-800 hover:bg-emerald-900 rounded-none font-medium transition-colors">
+                {{ __('Создать задачу') }}
+            </a>
         </div>
-    </form>
+        @endauth
 
-    <table>
-        <thead>
-            <tr>
-                <th>{{ __('ID') }}</th>
-                <th>{{ __('Название') }}</th>
-                <th>{{ __('Статус') }}</th>
-                <th>{{ __('Исполнитель') }}</th>
-                <th>{{ __('Автор') }}</th>
-                <th>{{ __('Дата создания') }}</th>
-                <th>{{ __('Действия') }}</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach ($tasks as $task)
-            <tr>
-                <td>{{ $task->id }}</td>
-                <td>
-                    <a href="{{ route('tasks.show', $task) }}">{{ $task->name }}</a>
-                </td>
-                <td>{{ $task->status->name }}</td>
-                <td>{{ $task->executor?->name }}</td>
-                <td>{{ $task->creator->name }}</td>
-                <td>{{ $task->created_at->format('d.m.Y') }}</td>
-                <td>
-                    @auth
-                    <a href="{{ route('tasks.edit', $task) }}">{{ __('Изменить') }}</a>
+        {{ html()->form('GET', route('tasks.index'))->class('w-full')->open() }}
+        <div class="flex flex-wrap items-center gap-6 mb-8 pb-6 border-b border-gray-100 w-full">
+            <div class="flex items-center gap-2">
+                <span class="text-xs text-gray-400 uppercase tracking-wider">{{ __('Статус') }}:</span>
+                {{ html()->select('filter[status_id]', $taskStatuses->pluck('name', 'id'))
+                        ->placeholder(__('Все'))
+                        ->value(request('filter.status_id'))
+                        ->class('text-sm bg-transparent border-none p-0 pr-6 focus:ring-0 text-black cursor-pointer') }}
+            </div>
 
-                    @can('delete', $task)
-                    <form action="{{ route('tasks.destroy', $task) }}" method="POST" style="display:inline;">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" onclick="return confirm('{{ __('Вы уверены?') }}')">
-                            {{ __('Удалить') }}
-                        </button>
-                    </form>
-                    @endcan
+            <div class="flex items-center gap-2">
+                <span class="text-xs text-gray-400 uppercase tracking-wider">{{ __('Автор') }}:</span>
+                {{ html()->select('filter[created_by_id]', $users->pluck('name', 'id'))
+                        ->placeholder(__('Все'))
+                        ->value(request('filter.created_by_id'))
+                        ->class('text-sm bg-transparent border-none p-0 pr-6 focus:ring-0 text-black cursor-pointer') }}
+            </div>
 
-                    @endauth
-                </td>
-            </tr>
-            @endforeach
-        </tbody>
-    </table>
+            <div class="flex items-center gap-2">
+                <span class="text-xs text-gray-400 uppercase tracking-wider">{{ __('Исполнитель') }}:</span>
+                {{ html()->select('filter[assigned_to_id]', $users->pluck('name', 'id'))
+                        ->placeholder(__('Все'))
+                        ->value(request('filter.assigned_to_id'))
+                        ->class('text-sm bg-transparent border-none p-0 pr-6 focus:ring-0 text-black cursor-pointer') }}
+            </div>
+
+            {{ html()->submit(__('Применить'))->class('text-xs uppercase tracking-wider px-4 py-2 text-white bg-emerald-800 hover:bg-emerald-900 rounded-none font-medium cursor-pointer transition-colors') }}
+        </div>
+        {{ html()->form()->close() }}
+
+        <div class="w-full overflow-x-auto">
+            <table class="w-full table-auto text-left text-sm border border-gray-300 border-collapse">
+                <thead>
+                    <tr class="bg-[#faf9f6] text-sm tracking-wide text-gray-700 border-b border-gray-300">
+                        <th scope="col" class="px-4 py-3 font-medium border-r border-gray-300 text-left">{{ __('ID') }}</th>
+                        <th scope="col" class="px-4 py-3 font-medium border-r border-gray-300 text-left">{{ __('Название') }}</th>
+                        <th scope="col" class="px-4 py-3 font-medium border-r border-gray-300 text-left">{{ __('Статус') }}</th>
+                        <th scope="col" class="px-4 py-3 font-medium border-r border-gray-300 text-left">{{ __('Исполнитель') }}</th>
+                        <th scope="col" class="px-4 py-3 font-medium border-r border-gray-300 text-left">{{ __('Автор') }}</th>
+                        <th scope="col" class="px-4 py-3 font-medium border-r border-gray-300 text-left">{{ __('Дата создания') }}</th>
+                        <th scope="col" class="px-4 py-3 font-medium text-left">{{ __('Действия') }}</th>
+                    </tr>
+                </thead>
+                <tbody class="text-black divide-y divide-gray-300">
+                    @foreach ($tasks as $task)
+                    <tr class="hover:bg-[#faf9f6]">
+                        <td class="px-4 py-4 border-r border-gray-300 text-left">{{ $task->id }}</td>
+                        <td class="px-4 py-4 border-r border-gray-300 text-left">
+                            <a href="{{ route('tasks.show', $task) }}" class="hover:underline">{{ $task->name }}</a>
+                        </td>
+                        <td class="px-4 py-4 border-r border-gray-300 text-left">{{ $task->status->name }}</td>
+                        <td class="px-4 py-4 border-r border-gray-300 text-left">{{ $task->executor?->name ?? '—' }}</td>
+                        <td class="px-4 py-4 border-r border-gray-300 text-left">{{ $task->creator->name }}</td>
+                        <td class="px-4 py-4 border-r border-gray-300 text-left">{{ $task->created_at->format('d.m.Y') }}</td>
+                        <td class="px-4 py-4 text-left">
+                            <div class="flex items-center gap-2 justify-start">
+                                @auth
+                                <a href="{{ route('tasks.edit', $task) }}" class="inline-block text-xs uppercase tracking-wider px-3 py-1.5 text-white bg-emerald-800 hover:bg-emerald-900 rounded-none font-medium transition-colors">{{ __('Изменить') }}</a>
+
+                                @can('delete', $task)
+                                <form action="{{ route('tasks.destroy', $task) }}" method="POST" class="inline-block m-0 p-0">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" onclick="return confirm('{{ __('Вы уверены?') }}')" class="inline-block text-xs uppercase tracking-wider px-3 py-1.5 text-white bg-emerald-800 hover:bg-emerald-900 rounded-none font-medium cursor-pointer transition-colors align-baseline text-left border-none">
+                                        {{ __('Удалить') }}
+                                    </button>
+                                </form>
+                                @endcan
+                                @endauth
+                            </div>
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    </div>
 </x-app-layout>
