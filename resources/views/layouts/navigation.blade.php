@@ -1,45 +1,46 @@
 <nav x-data="{ open: false }" class="w-full bg-emerald-800 text-white shadow-none">
     <div class="w-full px-6">
-        <div class="flex justify-between h-16">
-            <div class="flex items-center">
-                <div class="flex-shrink-0 flex items-center">
-                    <a href="{{ route('tasks.index') }}" class="text-xl font-medium tracking-tight hover:text-gray-200 transition-colors">
-                        {{ __('Менеджер задач') }}
+        <div class="flex items-center justify-between h-16 relative">
+
+            <div class="flex items-center min-w-[200px] z-10">
+                <a href="{{ route('tasks.index') }}" class="text-xl font-medium tracking-tight hover:text-gray-200 transition-colors whitespace-nowrap">
+                    {{ __('Менеджер задач') }}
+                </a>
+            </div>
+
+            <div class="hidden sm:flex items-center justify-center absolute inset-x-0 mx-auto w-fit h-full z-0">
+                <div class="flex items-center h-full space-x-2">
+                    <a href="{{ route('tasks.index') }}" class="inline-flex items-center text-lg font-normal text-white border-b-2 {{ request()->routeIs('tasks.*') ? 'border-white' : 'border-transparent' }} pb-1.5 px-4 h-fit hover:text-gray-200 transition-colors mb-[-17px]">
+                        {{ __('Задачи') }}
+                    </a>
+                    <a href="{{ route('task_statuses.index') }}" class="inline-flex items-center text-lg font-normal text-white border-b-2 {{ request()->routeIs('task_statuses.*') ? 'border-white' : 'border-transparent' }} pb-1.5 px-4 h-fit hover:text-gray-200 transition-colors mb-[-17px]">
+                        {{ __('Статусы') }}
+                    </a>
+                    <a href="{{ route('labels.index') }}" class="inline-flex items-center text-lg font-normal text-white border-b-2 {{ request()->routeIs('labels.*') ? 'border-white' : 'border-transparent' }} pb-1.5 px-4 h-fit hover:text-gray-200 transition-colors mb-[-17px]">
+                        {{ __('Метки') }}
                     </a>
                 </div>
             </div>
 
-            <div class="hidden sm:flex items-center h-full ml-12 mr-auto">
-                <a href="{{ route('tasks.index') }}" class="inline-flex items-center text-lg font-normal text-white border-b-2 {{ request()->routeIs('tasks.*') ? 'border-white' : 'border-transparent' }} pb-1.5 px-6 h-fit hover:text-gray-200 transition-colors">
-                    {{ __('Задачи') }}
-                </a>
-                <a href="{{ route('task_statuses.index') }}" class="inline-flex items-center text-lg font-normal text-white border-b-2 {{ request()->routeIs('task_statuses.*') ? 'border-white' : 'border-transparent' }} pb-1.5 px-6 h-fit hover:text-gray-200 transition-colors">
-                    {{ __('Статусы') }}
-                </a>
-                <a href="{{ route('labels.index') }}" class="inline-flex items-center text-lg font-normal text-white border-b-2 {{ request()->routeIs('labels.*') ? 'border-white' : 'border-transparent' }} pb-1.5 px-6 h-fit hover:text-gray-200 transition-colors">
-                    {{ __('Метки') }}
-                </a>
-            </div>
-
-            <div class="hidden sm:flex sm:items-center gap-8">
+            <div class="hidden sm:flex items-center justify-end min-w-[200px] gap-8 z-10">
                 @auth
-                <form method="POST" action="{{ route('logout') }}" class="m-0 p-0 inline">
+                <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" class="inline-flex items-center text-lg font-normal text-white hover:text-gray-200 transition-colors cursor-pointer">
+                    {{ __('Выход') }}
+                </a>
+                <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
                     @csrf
-                    <button type="submit" class="inline-flex items-center text-lg font-normal text-white hover:text-gray-200 transition-colors cursor-pointer bg-transparent border-none p-0">
-                        {{ __('Выход') }}
-                    </button>
                 </form>
                 @else
-                <a href="{{ route('login') }}" class="inline-flex items-center text-lg font-normal text-white hover:text-gray-200 transition-colors">
+                <a href="{{ route('login') }}" class="inline-flex items-center text-lg font-normal text-white hover:text-gray-200 transition-colors whitespace-nowrap">
                     {{ __('Войти') }}
                 </a>
-                <a href="{{ route('register') }}" class="inline-flex items-center text-lg font-normal text-white hover:text-gray-200 transition-colors">
+                <a href="{{ route('register') }}" class="inline-flex items-center text-lg font-normal text-white hover:text-gray-200 transition-colors whitespace-nowrap">
                     {{ __('Зарегистрироваться') }}
                 </a>
                 @endauth
             </div>
 
-            <div class="flex items-center sm:hidden">
+            <div class="flex items-center sm:hidden z-10">
                 <button @click="open = ! open" class="inline-flex items-center justify-center p-2 text-white hover:text-gray-200 focus:outline-none transition-colors">
                     <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
                         <path :class="{ 'hidden': open, 'inline-flex': !open }" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
