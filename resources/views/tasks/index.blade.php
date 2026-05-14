@@ -36,7 +36,9 @@
                         ->class('text-sm bg-transparent border-none p-0 pr-6 focus:ring-0 text-black cursor-pointer') }}
             </div>
 
-            {{ html()->submit(__('Применить'))->class('text-xs uppercase tracking-wider px-4 py-2 text-white bg-emerald-800 hover:bg-emerald-900 rounded-none font-medium cursor-pointer transition-colors') }}
+            <button type="submit" class="text-xs uppercase tracking-wider px-4 py-2 text-white bg-emerald-800 hover:bg-emerald-900 rounded-none font-medium cursor-pointer transition-colors">
+                {{ __('Применить') }}
+            </button>
         </div>
         {{ html()->form()->close() }}
 
