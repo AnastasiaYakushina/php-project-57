@@ -66,7 +66,7 @@ class TaskController extends Controller
 
         $task = new Task();
         $task->fill($data);
-        $task->created_by_id = auth()->id();
+        $task->fill(['created_by_id' => auth()->id()]);
         $task->save();
 
         $task->labels()->sync($request->input('labels', []));

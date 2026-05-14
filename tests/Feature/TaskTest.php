@@ -116,7 +116,7 @@ class TaskTest extends TestCase
         $response->assertRedirect('/tasks');
         $task = Task::where('name', 'Тестовая задача testTaskStore')->first();
         $this->assertNotNull($task);
-        $this->assertEquals($user->id, $task->created_by_id);
+        $this->assertEquals($user->id, $task->getAttribute('created_by_id'));
     }
 
     public function testTaskEdit(): void
@@ -137,7 +137,8 @@ class TaskTest extends TestCase
         $task = Task::factory()->create(['name' => 'Я до изменения']);
         $data = [
             'name' => 'Я изменен',
-            'status_id' => $task->status_id,
+            'status_id' => $task->getAttribute('status_id'),
+
         ];
         $response = $this->actingAs($user)->patch("tasks/{$task->id}", $data);
         $response->assertRedirect('/tasks');
