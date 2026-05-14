@@ -10,37 +10,52 @@
         </div>
         @endauth
 
-        {{ html()->form('GET', route('tasks.index'))->class('w-full')->open() }}
-        <div class="flex flex-wrap items-center gap-6 mb-8 pb-6 border-b border-gray-100 w-full">
-            <div class="flex items-center gap-2">
-                <span class="text-xs text-gray-400 uppercase tracking-wider">{{ __('Статус') }}:</span>
-                {{ html()->select('filter[status_id]', $taskStatuses->pluck('name', 'id'))
-                        ->placeholder(__('Все'))
-                        ->value(request('filter.status_id'))
-                        ->class('text-sm bg-transparent border-none p-0 pr-6 focus:ring-0 text-black cursor-pointer') }}
-            </div>
+        <form method="GET" action="{{ route('tasks.index') }}" class="w-full">
+            <div class="flex flex-wrap items-center gap-6 mb-8 pb-6 border-b border-gray-100 w-full">
 
-            <div class="flex items-center gap-2">
-                <span class="text-xs text-gray-400 uppercase tracking-wider">{{ __('Автор') }}:</span>
-                {{ html()->select('filter[created_by_id]', $users->pluck('name', 'id'))
-                        ->placeholder(__('Все'))
-                        ->value(request('filter.created_by_id'))
-                        ->class('text-sm bg-transparent border-none p-0 pr-6 focus:ring-0 text-black cursor-pointer') }}
-            </div>
+                <div class="flex items-center gap-2">
+                    <span class="text-xs text-gray-400 uppercase tracking-wider">{{ __('Статус') }}:</span>
+                    <select name="filter[status_id]" class="text-sm bg-transparent border-none p-0 pr-6 focus:ring-0 text-black cursor-pointer">
+                        <option value="">{{ __('Все') }}</option>
+                        @foreach($taskStatuses as $status)
+                        <option value="{{ $status->id }}" {{ request('filter.status_id') == $status->id ? 'selected' : '' }}>
+                            {{ $status->name }}
+                        </option>
+                        @endforeach
+                    </select>
+                </div>
 
-            <div class="flex items-center gap-2">
-                <span class="text-xs text-gray-400 uppercase tracking-wider">{{ __('Исполнитель') }}:</span>
-                {{ html()->select('filter[assigned_to_id]', $users->pluck('name', 'id'))
-                        ->placeholder(__('Все'))
-                        ->value(request('filter.assigned_to_id'))
-                        ->class('text-sm bg-transparent border-none p-0 pr-6 focus:ring-0 text-black cursor-pointer') }}
-            </div>
+                <div class="flex items-center gap-2">
+                    <span class="text-xs text-gray-400 uppercase tracking-wider">{{ __('Автор') }}:</span>
+                    <select name="filter[created_by_id]" class="text-sm bg-transparent border-none p-0 pr-6 focus:ring-0 text-black cursor-pointer">
+                        <option value="">{{ __('Все') }}</option>
+                        @foreach($users as $user)
+                        <option value="{{ $user->id }}" {{ request('filter.created_by_id') == $user->id ? 'selected' : '' }}>
+                            {{ $user->name }}
+                        </option>
+                        @endforeach
+                    </select>
+                </div>
 
-            <button type="submit" class="text-xs uppercase tracking-wider px-4 py-2 text-white bg-emerald-800 hover:bg-emerald-900 rounded-none font-medium cursor-pointer transition-colors">
-                {{ __('Применить') }}
-            </button>
-        </div>
-        {{ html()->form()->close() }}
+                <div class="flex items-center gap-2">
+                    <span class="text-xs text-gray-400 uppercase tracking-wider">{{ __('Исполнитель') }}:</span>
+                    <select name="filter[assigned_to_id]" class="text-sm bg-transparent border-none p-0 pr-6 focus:ring-0 text-black cursor-pointer">
+                        <option value="">{{ __('Все') }}</option>
+                        @foreach($users as $user)
+                        <option value="{{ $user->id }}" {{ request('filter.assigned_to_id') == $user->id ? 'selected' : '' }}>
+                            {{ $user->name }}
+                        </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <button type="submit" class="text-sm px-4 py-2 text-white bg-emerald-800 hover:bg-emerald-900 font-medium transition-colors">
+                    {{ __('Применить') }}
+                </button>
+
+            </div>
+        </form>
+
 
         <div class="w-full overflow-x-auto">
             <table class="w-full table-auto text-left text-sm border border-gray-300 border-collapse">
