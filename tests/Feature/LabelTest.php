@@ -44,7 +44,7 @@ class LabelTest extends TestCase
         ];
 
         foreach ($routes as [$method, $url, $data]) {
-            $response = $this->$method($url, $data);
+            $response = call_user_func([$this, $method], $url, $data);
             $response->assertRedirect('/login');
         }
     }

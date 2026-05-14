@@ -51,7 +51,7 @@ class TaskTest extends TestCase
         ];
 
         foreach ($routes as [$method, $url, $data]) {
-            $response = $this->$method($url, $data);
+            $response = call_user_func([$this, $method], $url, $data);
             $response->assertRedirect('/login');
         }
     }
@@ -152,7 +152,7 @@ class TaskTest extends TestCase
         $task = Task::factory()->create(['created_by_id' => $user->id]);
         $response = $this->actingAs($user)->delete("tasks/{$task->id}");
         $response->assertRedirect('/tasks');
-        $this->assertNull(Task::all()->first());
+        $this->assertNull(Task::first());
     }
 
     public function testTaskDestroyByNonCreator(): void
