@@ -22,25 +22,26 @@
                 </div>
             </div>
 
-            <div class="hidden sm:flex sm:items-center space-x-4">
+            <div class="flex items-center space-x-4">
                 @auth
+                <form method="POST" action="{{ route('logout') }}" id="logout-form-global" class="hidden">
+                    @csrf
+                </form>
                 <a href="{{ route('logout') }}"
-                    onclick="event.preventDefault(); document.getElementById('logout-form-global-desktop').submit();"
-                    class="text-base font-medium text-emerald-100 hover:text-white transition-colors cursor-pointer">
+                    onclick="event.preventDefault(); document.getElementById('logout-form-global').submit();"
+                    class="text-base font-medium text-emerald-100 hover:text-white transition-colors cursor-pointer whitespace-nowrap">
                     {{ __('Выход') }}
                 </a>
                 @else
-                <a href="{{ route('login') }}" class="text-base font-medium text-emerald-100 hover:text-white transition-colors">
+                <a href="{{ route('login') }}" class="text-base font-medium text-emerald-100 hover:text-white transition-colors whitespace-nowrap">
                     {{ __('Войти') }}
                 </a>
-                <a href="{{ route('register') }}" class="inline-flex items-center justify-center px-4 py-2 text-base font-medium text-emerald-800 bg-white hover:bg-emerald-50 rounded-md transition-colors">
+                <a href="{{ route('register') }}" class="inline-flex items-center justify-center px-4 py-2 text-base font-medium text-emerald-800 bg-white hover:bg-emerald-50 rounded-md transition-colors whitespace-nowrap">
                     {{ __('Зарегистрировать') }}
                 </a>
                 @endauth
-            </div>
 
-            <div class="-me-2 flex items-center sm:hidden">
-                <button @click="open = ! open" class="inline-flex items-center justify-center p-2 rounded-md text-emerald-200 hover:text-white hover:bg-emerald-700 focus:outline-none transition duration-150 ease-in-out">
+                <button @click="open = ! open" class="inline-flex items-center justify-center p-2 rounded-md text-emerald-200 hover:text-white hover:bg-emerald-700 focus:outline-none transition duration-150 ease-in-out sm:hidden ms-2">
                     <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
                         <path :class="{'hidden': open, 'inline-flex': ! open }" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                         <path :class="{'hidden': ! open, 'inline-flex': open }" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -62,33 +63,5 @@
                 {{ __('Метки') }}
             </a>
         </div>
-
-        <div class="pt-4 pb-1 border-t border-emerald-900">
-            @auth
-            <div class="space-y-1">
-                <a href="{{ route('logout') }}"
-                    onclick="event.preventDefault(); document.getElementById('logout-form-global-mobile').submit();"
-                    class="block pl-4 py-2 text-base font-medium text-emerald-100 hover:bg-emerald-700">
-                    {{ __('Выход') }}
-                </a>
-            </div>
-            @else
-            <div class="space-y-1 py-2">
-                <a href="{{ route('login') }}" class="block pl-4 py-2 text-base font-medium text-emerald-100 hover:bg-emerald-700">
-                    {{ __('Войти') }}
-                </a>
-                <a href="{{ route('register') }}" class="block pl-4 py-2 text-base font-medium text-emerald-100 hover:bg-emerald-700">
-                    {{ __('Зарегистрировать') }}
-                </a>
-            </div>
-            @endauth
-        </div>
     </div>
 </nav>
-
-<form id="logout-form-global-desktop" action="{{ route('logout') }}" method="POST" style="display: none;">
-    @csrf
-</form>
-<form id="logout-form-global-mobile" action="{{ route('logout') }}" method="POST" style="display: none;">
-    @csrf
-</form>
