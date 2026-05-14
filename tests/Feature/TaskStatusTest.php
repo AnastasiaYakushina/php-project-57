@@ -16,7 +16,9 @@ class TaskStatusTest extends TestCase
     {
         TaskStatus::factory()->create(['name' => 'В работе']);
         TaskStatus::factory()->create(['name' => 'Новый']);
+
         $response = $this->get('/task_statuses');
+
         $response->assertOk();
         $response->assertSee('В работе');
         $response->assertSee('Новый');
@@ -26,6 +28,7 @@ class TaskStatusTest extends TestCase
     public function testTaskStatusesIndexAsGuest(): void
     {
         $response = $this->get('/task_statuses');
+
         $response->assertOk();
         $response->assertDontSee('Создать');
         $response->assertDontSee('Изменить');
@@ -51,7 +54,9 @@ class TaskStatusTest extends TestCase
     public function testTaskStatusesCreate(): void
     {
         $user = User::factory()->create();
+
         $response = $this->actingAs($user)->get('task_statuses/create');
+
         $response->assertOk();
         $response->assertSee('name="name"', false);
     }
@@ -60,7 +65,9 @@ class TaskStatusTest extends TestCase
     {
         $user = User::factory()->create();
         $data = ['name' => 'Я создан'];
+
         $response = $this->actingAs($user)->post('task_statuses', $data);
+
         $response->assertRedirect('/task_statuses');
         $status = TaskStatus::where('name', 'Я создан')->first();
         $this->assertNotNull($status);
@@ -70,7 +77,9 @@ class TaskStatusTest extends TestCase
     {
         $user = User::factory()->create();
         $status = TaskStatus::factory()->create();
+
         $response = $this->actingAs($user)->get('task_statuses/1/edit');
+
         $response->assertOk();
         $response->assertSee('name="name"', false);
     }
@@ -80,7 +89,9 @@ class TaskStatusTest extends TestCase
         $user = User::factory()->create();
         $status = TaskStatus::factory()->create(['name' => 'Я до изменения']);
         $data = ['name' => 'Я изменен'];
+
         $response = $this->actingAs($user)->patch("task_statuses/{$status->id}", $data);
+
         $response->assertRedirect('/task_statuses');
         $updatedStatus = TaskStatus::where('name', 'Я изменен')->first();
         $this->assertNotNull($updatedStatus);
@@ -90,7 +101,9 @@ class TaskStatusTest extends TestCase
     {
         $user = User::factory()->create();
         $status = TaskStatus::factory()->create();
+
         $response = $this->actingAs($user)->delete("task_statuses/{$status->id}");
+
         $response->assertRedirect('/task_statuses');
         $this->assertNull(TaskStatus::first());
     }
@@ -100,7 +113,9 @@ class TaskStatusTest extends TestCase
         $user = User::factory()->create();
         $status = TaskStatus::factory()->create();
         $task = Task::factory()->create(['status_id' => $status->id]);
+
         $response = $this->actingAs($user)->delete("task_statuses/{$status->id}");
+
         $response->assertRedirect('/task_statuses');
         $this->assertDatabaseHas('task_statuses', ['id' => $status->id]);
     }
@@ -108,7 +123,9 @@ class TaskStatusTest extends TestCase
     public function testTaskStatusesCorrectValidation(): void
     {
         $user = User::factory()->create();
+
         $data = ['name' => ''];
+
         $response = $this->actingAs($user)
             ->from('/task_statuses/create')
             ->post('task_statuses', $data);
@@ -116,10 +133,12 @@ class TaskStatusTest extends TestCase
         $response->assertSessionHasErrors(['name' => 'Это обязательное поле']);
 
         $data = ['name' => 'Название статуса'];
+
         $response = $this->actingAs($user)->post('task_statuses', $data);
         $response->assertRedirect('/task_statuses');
 
         $data = ['name' => 'Название статуса'];
+
         $response = $this->actingAs($user)
             ->from('/task_statuses/create')
             ->post('task_statuses', $data);

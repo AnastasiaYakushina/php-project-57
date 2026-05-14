@@ -5,7 +5,6 @@ namespace Tests\Feature;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use App\Models\User;
-use App\Models\TaskStatus;
 use App\Models\Task;
 use App\Models\Label;
 
@@ -17,7 +16,9 @@ class LabelTest extends TestCase
     {
         Label::factory()->create(['name' => 'Срочно']);
         Label::factory()->create(['name' => 'Важно']);
+
         $response = $this->get('/labels');
+
         $response->assertOk();
         $response->assertSee('Срочно');
         $response->assertSee('Важно');
@@ -27,6 +28,7 @@ class LabelTest extends TestCase
     public function testLabelsIndexAsGuest(): void
     {
         $response = $this->get('/labels');
+
         $response->assertOk();
         $response->assertDontSee('Создать');
         $response->assertDontSee('Изменить');
@@ -52,7 +54,9 @@ class LabelTest extends TestCase
     public function testLabelsCreate(): void
     {
         $user = User::factory()->create();
+
         $response = $this->actingAs($user)->get('labels/create');
+
         $response->assertOk();
         $response->assertSee('name="name"', false);
         $response->assertSee('name="description"', false);
@@ -62,7 +66,9 @@ class LabelTest extends TestCase
     {
         $user = User::factory()->create();
         $data = ['name' => 'Я создана'];
+
         $response = $this->actingAs($user)->post('labels', $data);
+
         $response->assertRedirect('/labels');
         $label = Label::where('name', 'Я создана')->first();
         $this->assertNotNull($label);
@@ -72,7 +78,9 @@ class LabelTest extends TestCase
     {
         $user = User::factory()->create();
         $label = Label::factory()->create();
+
         $response = $this->actingAs($user)->get('labels/1/edit');
+
         $response->assertOk();
         $response->assertSee('name="name"', false);
     }
@@ -82,7 +90,9 @@ class LabelTest extends TestCase
         $user = User::factory()->create();
         $label = Label::factory()->create(['name' => 'Я до изменения']);
         $data = ['name' => 'Я изменена', 'description' => 'Новое описание'];
+
         $response = $this->actingAs($user)->patch("labels/{$label->id}", $data);
+
         $response->assertRedirect('/labels');
         $updatedLabel = Label::where('name', 'Я изменена')->where('description', 'Новое описание')->first();
         $this->assertNotNull($updatedLabel);
@@ -92,7 +102,9 @@ class LabelTest extends TestCase
     {
         $user = User::factory()->create();
         $label = Label::factory()->create();
+
         $response = $this->actingAs($user)->delete("labels/{$label->id}");
+
         $response->assertRedirect('/labels');
         $this->assertDatabaseMissing('labels', ['id' => $label->id]);
     }
@@ -103,7 +115,9 @@ class LabelTest extends TestCase
         $label = Label::factory()->create();
         $task = Task::factory()->create();
         $task->labels()->attach($label->id);
+
         $response = $this->actingAs($user)->delete("labels/{$label->id}");
+
         $response->assertRedirect('/labels');
         $this->assertDatabaseHas('labels', ['id' => $label->id]);
     }
@@ -112,6 +126,7 @@ class LabelTest extends TestCase
     {
         $user = User::factory()->create();
         $data = ['name' => ''];
+
         $response = $this->actingAs($user)
             ->from('/labels/create')
             ->post('labels', $data);
@@ -119,10 +134,12 @@ class LabelTest extends TestCase
         $response->assertSessionHasErrors(['name' => 'Это обязательное поле']);
 
         $data = ['name' => 'Название метки'];
+
         $response = $this->actingAs($user)->post('labels', $data);
         $response->assertRedirect('/labels');
 
         $data = ['name' => 'Название метки'];
+
         $response = $this->actingAs($user)
             ->from('/labels/create')
             ->post('labels', $data);

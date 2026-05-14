@@ -44,6 +44,7 @@ class TaskController extends Controller
         $taskStatuses = TaskStatus::all();
         $labels = Label::all();
         $users = User::all();
+
         return view('tasks.create', compact('task', 'taskStatuses', 'labels', 'users'));
     }
 
@@ -92,6 +93,7 @@ class TaskController extends Controller
         $taskStatuses = TaskStatus::all();
         $users = User::all();
         $labels = Label::all();
+
         return view('tasks.edit', compact('task', 'taskStatuses', 'users', 'labels'));
     }
 

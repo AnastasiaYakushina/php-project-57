@@ -16,13 +16,16 @@ class TaskTest extends TestCase
     public function testTaskIndex(): void
     {
         $status = TaskStatus::factory()->create(['name' => 'в работе']);
+
         Task::factory()->create([
             'name' => 'Первая задача',
             'status_id' => $status->id,
             'created_at' => now(),
         ]);
         Task::factory()->create(['name' => 'Вторая задача']);
+
         $response = $this->get('/tasks');
+
         $response->assertOk();
         $response->assertSee('Первая задача');
         $response->assertSee('Вторая задача');
@@ -34,6 +37,7 @@ class TaskTest extends TestCase
     public function testTaskIndexAsGuest(): void
     {
         $response = $this->get('/tasks');
+
         $response->assertOk();
         $response->assertDontSee('Создать');
         $response->assertDontSee('Изменить');
@@ -60,7 +64,9 @@ class TaskTest extends TestCase
     {
         $user = User::factory()->create();
         Task::factory()->create(['name' => 'Задача', 'created_by_id' => $user->id]);
+
         $response = $this->actingAs($user)->get('/tasks');
+
         $response->assertOk();
         $response->assertSee('Создать');
         $response->assertSee('Изменить');
@@ -72,7 +78,9 @@ class TaskTest extends TestCase
         $user1 = User::factory()->create();
         $user2 = User::factory()->create();
         Task::factory()->create(['name' => 'Задача', 'created_by_id' => $user1->id]);
+
         $response = $this->actingAs($user2)->get('/tasks');
+
         $response->assertOk();
         $response->assertSee('Создать');
         $response->assertSee('Изменить');
@@ -85,7 +93,9 @@ class TaskTest extends TestCase
         $label = Label::factory()->create(['name' => 'Срочно']);
         $task = Task::factory()->create(['description' => 'Интересное описание интересной задачи']);
         $task->labels()->attach($label->id);
+
         $response = $this->actingAs($user)->get("/tasks/{$task->id}");
+
         $response->assertOk();
         $response->assertSee('Описание');
         $response->assertSee('Интересное описание интересной задачи');
@@ -95,7 +105,9 @@ class TaskTest extends TestCase
     public function testTaskCreate(): void
     {
         $user = User::factory()->create();
+
         $response = $this->actingAs($user)->get('/tasks/create');
+
         $response->assertOk();
         $response->assertSee('name="name"', false);
         $response->assertSee('name="description"', false);
@@ -112,7 +124,9 @@ class TaskTest extends TestCase
             'description' => 'Описание задачи',
             'status_id' => $status->id
         ];
+
         $response = $this->actingAs($user)->post('/tasks', $data);
+
         $response->assertRedirect('/tasks');
         $task = Task::where('name', 'Тестовая задача testTaskStore')->first();
         $this->assertNotNull($task);
@@ -123,7 +137,9 @@ class TaskTest extends TestCase
     {
         $user = User::factory()->create();
         $task = Task::factory()->create();
-        $response = $this->actingAs($user)->get("/tasks/{$task->id}/edit"); // Динамический ID
+
+        $response = $this->actingAs($user)->get("/tasks/{$task->id}/edit");
+
         $response->assertOk();
         $response->assertSee('name="name"', false);
         $response->assertSee('name="description"', false);
@@ -140,7 +156,9 @@ class TaskTest extends TestCase
             'status_id' => $task->getAttribute('status_id'),
 
         ];
+
         $response = $this->actingAs($user)->patch("tasks/{$task->id}", $data);
+
         $response->assertRedirect('/tasks');
         $updatedTask = Task::where('name', 'Я изменен')->first();
         $this->assertNotNull($updatedTask);
@@ -150,7 +168,9 @@ class TaskTest extends TestCase
     {
         $user = User::factory()->create();
         $task = Task::factory()->create(['created_by_id' => $user->id]);
+
         $response = $this->actingAs($user)->delete("tasks/{$task->id}");
+
         $response->assertRedirect('/tasks');
         $this->assertNull(Task::first());
     }
@@ -160,7 +180,9 @@ class TaskTest extends TestCase
         $user = User::factory()->create();
         $user2 = User::factory()->create();
         $task = Task::factory()->create(['created_by_id' => $user->id]);
+
         $response = $this->actingAs($user2)->delete("tasks/{$task->id}");
+
         $response->assertForbidden();
         $this->assertDatabaseHas('tasks', ['id' => $task->id]);
     }
@@ -177,9 +199,7 @@ class TaskTest extends TestCase
             ]);
 
         $response->assertRedirect('/tasks/create');
-
         $response->assertSessionHasErrors(['name', 'status_id']);
-
         $this->assertEquals(
             'Это обязательное поле',
             session('errors')->first('name')
