@@ -15,9 +15,12 @@ class TaskController extends Controller
 {
     use AuthorizesRequests;
 
-    /**
-     * Display a listing of the resource.
-     */
+    public function __construct()
+    {
+        $this->authorizeResource(Task::class);
+    }
+
+
     public function index()
     {
         $tasks = QueryBuilder::for(Task::class)
@@ -35,9 +38,7 @@ class TaskController extends Controller
         return view('tasks.index', compact('tasks', 'taskStatuses', 'users'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
+
     public function create()
     {
         $task = new Task();
@@ -48,12 +49,10 @@ class TaskController extends Controller
         return view('tasks.create', compact('task', 'taskStatuses', 'labels', 'users'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+
     public function store(Request $request)
     {
-        $data = $request->validate([
+        $validated = $request->validate([
             'name' => 'required',
             'status_id' => 'required|exists:task_statuses,id',
             'description' => 'nullable|string',
@@ -66,7 +65,7 @@ class TaskController extends Controller
         ]);
 
         $task = new Task();
-        $task->fill($data);
+        $task->fill($validated);
         $task->fill(['created_by_id' => auth()->id()]);
         $task->save();
 
@@ -77,17 +76,13 @@ class TaskController extends Controller
             ->route('tasks.index');
     }
 
-    /**
-     * Display the specified resource.
-     */
+
     public function show(Task $task)
     {
         return view('tasks.show', compact('task'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
+
     public function edit(Task $task)
     {
         $taskStatuses = TaskStatus::all();
@@ -97,12 +92,10 @@ class TaskController extends Controller
         return view('tasks.edit', compact('task', 'taskStatuses', 'users', 'labels'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
+
     public function update(Request $request, Task $task)
     {
-        $data = $request->validate([
+        $validated = $request->validate([
             'name' => 'required',
             'status_id' => 'required|exists:task_statuses,id',
             'description' => 'nullable|string',
@@ -114,7 +107,7 @@ class TaskController extends Controller
             'status_id.required' => 'Это обязательное поле',
         ]);
 
-        $task->fill($data);
+        $task->fill($validated);
         $task->save();
 
         $task->labels()->sync($request->input('labels', []));
@@ -124,12 +117,9 @@ class TaskController extends Controller
             ->route('tasks.index');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
+
     public function destroy(Task $task)
     {
-        $this->authorize('delete', $task);
         $task->delete();
 
         flash('Задача успешно удалена')->success();

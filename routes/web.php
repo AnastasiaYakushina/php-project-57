@@ -24,20 +24,6 @@ Route::middleware('auth')->group(function () use ($profileRoute) {
 
 require __DIR__ . '/auth.php';
 
-Route::resource('task_statuses', TaskStatusController::class)->only(['index']);
-
-Route::middleware('auth')->group(function () {
-    Route::resource('task_statuses', TaskStatusController::class)->except(['index']);
-});
-
-Route::resource('tasks', TaskController::class)->only(['index']);
-
-Route::middleware('auth')->group(function () {
-    Route::resource('tasks', TaskController::class)->except(['index']);
-});
-
-Route::resource('labels', LabelController::class)->only(['index']);
-
-Route::middleware('auth')->group(function () {
-    Route::resource('labels', LabelController::class)->except(['index']);
-});
+Route::resource('task_statuses', TaskStatusController::class);
+Route::resource('tasks', TaskController::class);
+Route::resource('labels', LabelController::class);

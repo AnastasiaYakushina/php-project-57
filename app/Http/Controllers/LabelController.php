@@ -4,33 +4,34 @@ namespace App\Http\Controllers;
 
 use App\Models\Label;
 use Illuminate\Http\Request;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class LabelController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    use AuthorizesRequests;
+
+    public function __construct()
+    {
+        $this->authorizeResource(Label::class);
+    }
+
     public function index()
     {
         $labels = Label::all();
         return view('labels.index', compact('labels'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
+
     public function create()
     {
         $label = new Label();
         return view('labels.create', compact('label'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+
     public function store(Request $request)
     {
-        $data = $request->validate([
+        $validated = $request->validate([
             'name' => 'required|unique:labels',
             'description' => 'nullable|string',
         ], [
@@ -39,7 +40,7 @@ class LabelController extends Controller
         ]);
 
         $label = new Label();
-        $label->fill($data);
+        $label->fill($validated);
         $label->save();
 
         flash('Метка успешно создана')->success();
@@ -47,24 +48,16 @@ class LabelController extends Controller
             ->route('labels.index');
     }
 
-    /**
-     * Display the specified resource.
-     */
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(Label $label)
     {
         return view('labels.edit', compact('label'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
+
     public function update(Request $request, Label $label)
     {
-        $data = $request->validate([
+        $validated = $request->validate([
             'name' => "required|unique:labels,name,{$label->id}",
             'description' => 'nullable|string',
         ], [
@@ -72,7 +65,7 @@ class LabelController extends Controller
             'name.unique' => 'Метка с таким именем уже существует',
         ]);
 
-        $label->fill($data);
+        $label->fill($validated);
         $label->save();
 
         flash('Метка успешно изменена')->success();
@@ -80,9 +73,7 @@ class LabelController extends Controller
             ->route('labels.index');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
+
     public function destroy(Label $label)
     {
         if ($label->tasks()->exists()) {
