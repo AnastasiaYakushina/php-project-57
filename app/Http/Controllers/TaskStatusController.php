@@ -33,9 +33,10 @@ class TaskStatusController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required|unique:task_statuses',
+            'name' => 'required|max:255|unique:task_statuses',
         ], [
             'name.required' => 'Это обязательное поле',
+            'name.max' => 'Название статуса не может превышать 255 символов',
             'name.unique' => 'Статус с таким именем уже существует',
         ]);
 
@@ -58,9 +59,10 @@ class TaskStatusController extends Controller
     public function update(Request $request, TaskStatus $taskStatus)
     {
         $validated = $request->validate([
-            'name' => "required|unique:task_statuses,name,{$taskStatus->id}",
+            'name' => "required|max:255|unique:task_statuses,name,{$taskStatus->id}",
         ], [
             'name.required' => 'Это обязательное поле',
+            'name.max' => 'Название статуса не может превышать 255 символов',
             'name.unique' => 'Статус с таким именем уже существует',
         ]);
 

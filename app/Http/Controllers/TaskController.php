@@ -7,6 +7,7 @@ use App\Models\TaskStatus;
 use App\Models\User;
 use App\Models\Label;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
@@ -53,7 +54,7 @@ class TaskController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required',
+            'name' => 'required|max:255',
             'status_id' => 'required|exists:task_statuses,id',
             'description' => 'nullable|string',
             'assigned_to_id' => 'nullable|exists:users,id',
@@ -61,13 +62,12 @@ class TaskController extends Controller
             'labels.*' => 'exists:labels,id',
         ], [
             'name.required' => 'Это обязательное поле',
+            'name.max' => 'Название задачи не может превышать 255 символов',
             'status_id.required' => 'Это обязательное поле',
         ]);
 
         $task = new Task();
-        $task->fill($validated);
-        $task->fill(['created_by_id' => auth()->id()]);
-        $task->save();
+        $task = Auth::user()->createdTasks()->create($validated);
 
         $task->labels()->sync($request->input('labels', []));
 
@@ -96,7 +96,7 @@ class TaskController extends Controller
     public function update(Request $request, Task $task)
     {
         $validated = $request->validate([
-            'name' => 'required',
+            'name' => 'required|max:255',
             'status_id' => 'required|exists:task_statuses,id',
             'description' => 'nullable|string',
             'assigned_to_id' => 'nullable|exists:users,id',
@@ -104,6 +104,7 @@ class TaskController extends Controller
             'labels.*' => 'exists:labels,id',
         ], [
             'name.required' => 'Это обязательное поле',
+            'name.max' => 'Название задачи не может превышать 255 символов',
             'status_id.required' => 'Это обязательное поле',
         ]);
 

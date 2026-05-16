@@ -32,10 +32,11 @@ class LabelController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required|unique:labels',
+            'name' => 'required|max:255|unique:labels',
             'description' => 'nullable|string',
         ], [
             'name.required' => 'Это обязательное поле',
+            'name.max' => 'Название метки не может превышать 255 символов',
             'name.unique' => 'Метка с таким именем уже существует',
         ]);
 
@@ -58,10 +59,11 @@ class LabelController extends Controller
     public function update(Request $request, Label $label)
     {
         $validated = $request->validate([
-            'name' => "required|unique:labels,name,{$label->id}",
+            'name' => "required|max:255|unique:labels,name,{$label->id}",
             'description' => 'nullable|string',
         ], [
             'name.required' => 'Это обязательное поле',
+            'name.max' => 'Название метки не может превышать 255 символов',
             'name.unique' => 'Метка с таким именем уже существует',
         ]);
 

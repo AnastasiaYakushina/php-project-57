@@ -29,7 +29,7 @@ class TaskPolicy
 
     public function delete(User $user, Task $task): bool
     {
-        return $user->id === $task->getAttribute('created_by_id');
+        return $task->createdBy->is($user);
     }
 
     public function restore(User $user, Task $task): bool
