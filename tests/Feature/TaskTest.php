@@ -24,7 +24,7 @@ class TaskTest extends TestCase
         ]);
         Task::factory()->create(['name' => 'Вторая задача']);
 
-        $response = $this->get('/tasks');
+        $response = $this->get(route('tasks.index'));
 
         $response->assertOk();
         $response->assertSee('Первая задача');
@@ -36,7 +36,7 @@ class TaskTest extends TestCase
 
     public function testTaskIndexAsGuest(): void
     {
-        $response = $this->get('/tasks');
+        $response = $this->get(route('tasks.index'));
 
         $response->assertOk();
         $response->assertDontSee('Создать');
@@ -44,28 +44,30 @@ class TaskTest extends TestCase
         $response->assertDontSee('Удалить');
     }
 
-    // public function testTaskRedirectToAuthPageForGuest(): void
-    // {
-    //     $routes = [
-    //         ['get', '/tasks/create', []],
-    //         ['get', '/tasks/1/edit', []],
-    //         ['post', '/tasks', ['name' => 'test']],
-    //         ['put', '/tasks/1', ['name' => 'test']],
-    //         ['delete', '/tasks/1', []],
-    //     ];
+    public function testTaskRedirectToAuthPageForGuest(): void
+    {
+        $task = Task::factory()->create();
 
-    //     foreach ($routes as [$method, $url, $data]) {
-    //         $response = call_user_func([$this, $method], $url, $data);
-    //         $response->assertForbidden();
-    //     }
-    // }
+        $routes = [
+            ['get', route('tasks.create'), []],
+            ['get', route('tasks.edit', $task), []],
+            ['post', route('tasks.store'), ['name' => 'test']],
+            ['put', route('tasks.update', $task), ['name' => 'test']],
+            ['delete', route('tasks.destroy', $task), []],
+        ];
+
+        foreach ($routes as [$method, $url, $data]) {
+            $response = call_user_func([$this, $method], $url, $data);
+            $response->assertForbidden();
+        }
+    }
 
     public function testTaskIndexAsAuthCreator(): void
     {
         $user = User::factory()->create();
         Task::factory()->create(['name' => 'Задача', 'created_by_id' => $user->id]);
 
-        $response = $this->actingAs($user)->get('/tasks');
+        $response = $this->actingAs($user)->get(route('tasks.index'));
 
         $response->assertOk();
         $response->assertSee('Создать');
@@ -79,7 +81,7 @@ class TaskTest extends TestCase
         $user2 = User::factory()->create();
         Task::factory()->create(['name' => 'Задача', 'created_by_id' => $user1->id]);
 
-        $response = $this->actingAs($user2)->get('/tasks');
+        $response = $this->actingAs($user2)->get(route('tasks.index'));
 
         $response->assertOk();
         $response->assertSee('Создать');
@@ -94,7 +96,7 @@ class TaskTest extends TestCase
         $task = Task::factory()->create(['description' => 'Интересное описание интересной задачи']);
         $task->labels()->attach($label->id);
 
-        $response = $this->actingAs($user)->get("/tasks/{$task->id}");
+        $response = $this->actingAs($user)->get(route('tasks.show', $task));
 
         $response->assertOk();
         $response->assertSee('Описание');
@@ -106,7 +108,7 @@ class TaskTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $response = $this->actingAs($user)->get('/tasks/create');
+        $response = $this->actingAs($user)->get(route('tasks.create'));
 
         $response->assertOk();
         $response->assertSee('name="name"', false);
@@ -125,12 +127,14 @@ class TaskTest extends TestCase
             'status_id' => $status->id
         ];
 
-        $response = $this->actingAs($user)->post('/tasks', $data);
+        $response = $this->actingAs($user)->post(route('tasks.store'), $data);
 
-        $response->assertRedirect('/tasks');
-        $task = Task::where('name', 'Тестовая задача testTaskStore')->first();
-        $this->assertNotNull($task);
-        $this->assertEquals($user->id, $task->getAttribute('created_by_id'));
+        $response->assertRedirect(route('tasks.index'));
+
+        $this->assertDatabaseHas('tasks', [
+            'name' => 'Тестовая задача testTaskStore',
+            'created_by_id' => $user->id
+        ]);
     }
 
     public function testTaskEdit(): void
@@ -138,7 +142,7 @@ class TaskTest extends TestCase
         $user = User::factory()->create();
         $task = Task::factory()->create();
 
-        $response = $this->actingAs($user)->get("/tasks/{$task->id}/edit");
+        $response = $this->actingAs($user)->get(route('tasks.edit', $task));
 
         $response->assertOk();
         $response->assertSee('name="name"', false);
@@ -154,14 +158,16 @@ class TaskTest extends TestCase
         $data = [
             'name' => 'Я изменен',
             'status_id' => $task->getAttribute('status_id'),
-
         ];
 
-        $response = $this->actingAs($user)->patch("tasks/{$task->id}", $data);
+        $response = $this->actingAs($user)->patch(route('tasks.update', $task), $data);
 
-        $response->assertRedirect('/tasks');
-        $updatedTask = Task::where('name', 'Я изменен')->first();
-        $this->assertNotNull($updatedTask);
+        $response->assertRedirect(route('tasks.index'));
+
+        $this->assertDatabaseHas('tasks', [
+            'id' => $task->id,
+            'name' => 'Я изменен'
+        ]);
     }
 
     public function testTaskDestroyByCreator(): void
@@ -169,10 +175,13 @@ class TaskTest extends TestCase
         $user = User::factory()->create();
         $task = Task::factory()->create(['created_by_id' => $user->id]);
 
-        $response = $this->actingAs($user)->delete("tasks/{$task->id}");
+        $response = $this->actingAs($user)->delete(route('tasks.destroy', $task));
 
-        $response->assertRedirect('/tasks');
-        $this->assertNull(Task::first());
+        $response->assertRedirect(route('tasks.index'));
+
+        $this->assertDatabaseMissing('tasks', [
+            'id' => $task->id
+        ]);
     }
 
     public function testTaskDestroyByNonCreator(): void
@@ -181,7 +190,7 @@ class TaskTest extends TestCase
         $user2 = User::factory()->create();
         $task = Task::factory()->create(['created_by_id' => $user->id]);
 
-        $response = $this->actingAs($user2)->delete("tasks/{$task->id}");
+        $response = $this->actingAs($user2)->delete(route('tasks.destroy', $task));
 
         $response->assertForbidden();
         $this->assertDatabaseHas('tasks', ['id' => $task->id]);
@@ -192,13 +201,13 @@ class TaskTest extends TestCase
         $user = User::factory()->create();
 
         $response = $this->actingAs($user)
-            ->from('/tasks/create')
-            ->post('/tasks', [
+            ->from(route('tasks.create'))
+            ->post(route('tasks.store'), [
                 'name' => '',
                 'status_id' => '',
             ]);
 
-        $response->assertRedirect('/tasks/create');
+        $response->assertRedirect(route('tasks.create'));
         $response->assertSessionHasErrors(['name', 'status_id']);
         $this->assertEquals(
             'Это обязательное поле',
@@ -221,7 +230,7 @@ class TaskTest extends TestCase
 
         Task::factory()->create(['name' => 'Лишняя задача']);
 
-        $response = $this->actingAs($createdBy)->get('/tasks?' . http_build_query([
+        $response = $this->actingAs($createdBy)->get(route('tasks.index') . '?' . http_build_query([
             'filter' => [
                 'status_id' => $status->id,
                 'created_by_id' => $createdBy->id,

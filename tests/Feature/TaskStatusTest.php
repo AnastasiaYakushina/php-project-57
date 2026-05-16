@@ -17,7 +17,7 @@ class TaskStatusTest extends TestCase
         TaskStatus::factory()->create(['name' => 'В работе']);
         TaskStatus::factory()->create(['name' => 'Новый']);
 
-        $response = $this->get('/task_statuses');
+        $response = $this->get(route('task_statuses.index'));
 
         $response->assertOk();
         $response->assertSee('В работе');
@@ -27,7 +27,7 @@ class TaskStatusTest extends TestCase
 
     public function testTaskStatusesIndexAsGuest(): void
     {
-        $response = $this->get('/task_statuses');
+        $response = $this->get(route('task_statuses.index'));
 
         $response->assertOk();
         $response->assertDontSee('Создать');
@@ -35,27 +35,29 @@ class TaskStatusTest extends TestCase
         $response->assertDontSee('Удалить');
     }
 
-    // public function testTaskStatusesRedirectToAuthPageForGuest(): void
-    // {
-    //     $routes = [
-    //         ['get', 'task_statuses/create', []],
-    //         ['get', 'task_statuses/1/edit', []],
-    //         ['post', 'task_statuses', ['name' => 'test']],
-    //         ['put', 'task_statuses/1', ['name' => 'test']],
-    //         ['delete', 'task_statuses/1', []],
-    //     ];
+    public function testTaskStatusesRedirectToAuthPageForGuest(): void
+    {
+        $status = TaskStatus::factory()->create();
 
-    //     foreach ($routes as [$method, $url, $data]) {
-    //         $response = call_user_func([$this, $method], $url, $data);
-    //         $response->assertForbidden();
-    //     }
-    // }
+        $routes = [
+            ['get', route('task_statuses.create'), []],
+            ['get', route('task_statuses.edit', $status), []],
+            ['post', route('task_statuses.store'), ['name' => 'test']],
+            ['put', route('task_statuses.update', $status), ['name' => 'test']],
+            ['delete', route('task_statuses.destroy', $status), []],
+        ];
+
+        foreach ($routes as [$method, $url, $data]) {
+            $response = call_user_func([$this, $method], $url, $data);
+            $response->assertForbidden();
+        }
+    }
 
     public function testTaskStatusesCreate(): void
     {
         $user = User::factory()->create();
 
-        $response = $this->actingAs($user)->get('task_statuses/create');
+        $response = $this->actingAs($user)->get(route('task_statuses.create'));
 
         $response->assertOk();
         $response->assertSee('name="name"', false);
@@ -66,11 +68,11 @@ class TaskStatusTest extends TestCase
         $user = User::factory()->create();
         $data = ['name' => 'Я создан'];
 
-        $response = $this->actingAs($user)->post('task_statuses', $data);
+        $response = $this->actingAs($user)->post(route('task_statuses.store'), $data);
 
-        $response->assertRedirect('/task_statuses');
-        $status = TaskStatus::where('name', 'Я создан')->first();
-        $this->assertNotNull($status);
+        $response->assertRedirect(route('task_statuses.index'));
+
+        $this->assertDatabaseHas('task_statuses', ['name' => 'Я создан']);
     }
 
     public function testTaskStatusesEdit(): void
@@ -78,7 +80,7 @@ class TaskStatusTest extends TestCase
         $user = User::factory()->create();
         $status = TaskStatus::factory()->create();
 
-        $response = $this->actingAs($user)->get('task_statuses/1/edit');
+        $response = $this->actingAs($user)->get(route('task_statuses.edit', $status));
 
         $response->assertOk();
         $response->assertSee('name="name"', false);
@@ -90,11 +92,11 @@ class TaskStatusTest extends TestCase
         $status = TaskStatus::factory()->create(['name' => 'Я до изменения']);
         $data = ['name' => 'Я изменен'];
 
-        $response = $this->actingAs($user)->patch("task_statuses/{$status->id}", $data);
+        $response = $this->actingAs($user)->patch(route('task_statuses.update', $status), $data);
 
-        $response->assertRedirect('/task_statuses');
-        $updatedStatus = TaskStatus::where('name', 'Я изменен')->first();
-        $this->assertNotNull($updatedStatus);
+        $response->assertRedirect(route('task_statuses.index'));
+
+        $this->assertDatabaseHas('task_statuses', ['name' => 'Я изменен']);
     }
 
     public function testTaskStatusesDestroy(): void
@@ -102,21 +104,22 @@ class TaskStatusTest extends TestCase
         $user = User::factory()->create();
         $status = TaskStatus::factory()->create();
 
-        $response = $this->actingAs($user)->delete("task_statuses/{$status->id}");
+        $response = $this->actingAs($user)->delete(route('task_statuses.destroy', $status));
 
-        $response->assertRedirect('/task_statuses');
-        $this->assertNull(TaskStatus::first());
+        $response->assertRedirect(route('task_statuses.index'));
+
+        $this->assertDatabaseMissing('task_statuses', ['id' => $status->id]);
     }
 
     public function testTaskStatusesWithTaskNonDestroy(): void
     {
         $user = User::factory()->create();
         $status = TaskStatus::factory()->create();
-        $task = Task::factory()->create(['status_id' => $status->id]);
+        Task::factory()->create(['status_id' => $status->id]);
 
-        $response = $this->actingAs($user)->delete("task_statuses/{$status->id}");
+        $response = $this->actingAs($user)->delete(route('task_statuses.destroy', $status));
 
-        $response->assertRedirect('/task_statuses');
+        $response->assertRedirect(route('task_statuses.index'));
         $this->assertDatabaseHas('task_statuses', ['id' => $status->id]);
     }
 
@@ -127,22 +130,22 @@ class TaskStatusTest extends TestCase
         $data = ['name' => ''];
 
         $response = $this->actingAs($user)
-            ->from('/task_statuses/create')
-            ->post('task_statuses', $data);
-        $response->assertRedirect('/task_statuses/create');
+            ->from(route('task_statuses.create'))
+            ->post(route('task_statuses.store'), $data);
+        $response->assertRedirect(route('task_statuses.create'));
         $response->assertSessionHasErrors(['name' => 'Это обязательное поле']);
 
         $data = ['name' => 'Название статуса'];
 
-        $response = $this->actingAs($user)->post('task_statuses', $data);
-        $response->assertRedirect('/task_statuses');
+        $response = $this->actingAs($user)->post(route('task_statuses.store'), $data);
+        $response->assertRedirect(route('task_statuses.index'));
 
         $data = ['name' => 'Название статуса'];
 
         $response = $this->actingAs($user)
-            ->from('/task_statuses/create')
-            ->post('task_statuses', $data);
-        $response->assertRedirect('/task_statuses/create');
+            ->from(route('task_statuses.create'))
+            ->post(route('task_statuses.store'), $data);
+        $response->assertRedirect(route('task_statuses.create'));
         $response->assertSessionHasErrors(['name' => 'Статус с таким именем уже существует']);
     }
 }

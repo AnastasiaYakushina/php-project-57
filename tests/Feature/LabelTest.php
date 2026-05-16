@@ -17,7 +17,7 @@ class LabelTest extends TestCase
         Label::factory()->create(['name' => 'Срочно']);
         Label::factory()->create(['name' => 'Важно']);
 
-        $response = $this->get('/labels');
+        $response = $this->get(route('labels.index'));
 
         $response->assertOk();
         $response->assertSee('Срочно');
@@ -27,7 +27,7 @@ class LabelTest extends TestCase
 
     public function testLabelsIndexAsGuest(): void
     {
-        $response = $this->get('/labels');
+        $response = $this->get(route('labels.index'));
 
         $response->assertOk();
         $response->assertDontSee('Создать');
@@ -35,27 +35,29 @@ class LabelTest extends TestCase
         $response->assertDontSee('Удалить');
     }
 
-    // public function testLabelsRedirectToAuthPageForGuest(): void
-    // {
-    //     $routes = [
-    //         ['get', 'labels/create', []],
-    //         ['get', 'labels/1/edit', []],
-    //         ['post', 'labels', ['name' => 'test']],
-    //         ['put', 'labels/1', ['name' => 'test']],
-    //         ['delete', 'labels/1', []],
-    //     ];
+    public function testLabelsRedirectToAuthPageForGuest(): void
+    {
+        $label = Label::factory()->create();
 
-    //     foreach ($routes as [$method, $url, $data]) {
-    //         $response = call_user_func([$this, $method], $url, $data);
-    //         $response->assertForbidden();
-    //     }
-    // }
+        $routes = [
+            ['get', route('labels.create'), []],
+            ['get', route('labels.edit', $label), []],
+            ['post', route('labels.store'), ['name' => 'test']],
+            ['put', route('labels.update', $label), ['name' => 'test']],
+            ['delete', route('labels.destroy', $label), []],
+        ];
+
+        foreach ($routes as [$method, $url, $data]) {
+            $response = call_user_func([$this, $method], $url, $data);
+            $response->assertForbidden();
+        }
+    }
 
     public function testLabelsCreate(): void
     {
         $user = User::factory()->create();
 
-        $response = $this->actingAs($user)->get('labels/create');
+        $response = $this->actingAs($user)->get(route('labels.create'));
 
         $response->assertOk();
         $response->assertSee('name="name"', false);
@@ -67,11 +69,11 @@ class LabelTest extends TestCase
         $user = User::factory()->create();
         $data = ['name' => 'Я создана'];
 
-        $response = $this->actingAs($user)->post('labels', $data);
+        $response = $this->actingAs($user)->post(route('labels.store'), $data);
 
-        $response->assertRedirect('/labels');
-        $label = Label::where('name', 'Я создана')->first();
-        $this->assertNotNull($label);
+        $response->assertRedirect(route('labels.index'));
+
+        $this->assertDatabaseHas('labels', ['name' => 'Я создана']);
     }
 
     public function testLabelsEdit(): void
@@ -79,7 +81,7 @@ class LabelTest extends TestCase
         $user = User::factory()->create();
         $label = Label::factory()->create();
 
-        $response = $this->actingAs($user)->get('labels/1/edit');
+        $response = $this->actingAs($user)->get(route('labels.edit', $label));
 
         $response->assertOk();
         $response->assertSee('name="name"', false);
@@ -91,11 +93,10 @@ class LabelTest extends TestCase
         $label = Label::factory()->create(['name' => 'Я до изменения']);
         $data = ['name' => 'Я изменена', 'description' => 'Новое описание'];
 
-        $response = $this->actingAs($user)->patch("labels/{$label->id}", $data);
+        $response = $this->actingAs($user)->patch(route('labels.update', $label), $data);
 
-        $response->assertRedirect('/labels');
-        $updatedLabel = Label::where('name', 'Я изменена')->where('description', 'Новое описание')->first();
-        $this->assertNotNull($updatedLabel);
+        $response->assertRedirect(route('labels.index'));
+        $this->assertDatabaseHas('labels', ['name' => 'Я изменена', 'description' => 'Новое описание']);
     }
 
     public function testLabelDestroy(): void
@@ -103,9 +104,9 @@ class LabelTest extends TestCase
         $user = User::factory()->create();
         $label = Label::factory()->create();
 
-        $response = $this->actingAs($user)->delete("labels/{$label->id}");
+        $response = $this->actingAs($user)->delete(route('labels.destroy', $label));
 
-        $response->assertRedirect('/labels');
+        $response->assertRedirect(route('labels.index'));
         $this->assertDatabaseMissing('labels', ['id' => $label->id]);
     }
 
@@ -116,9 +117,9 @@ class LabelTest extends TestCase
         $task = Task::factory()->create();
         $task->labels()->attach($label->id);
 
-        $response = $this->actingAs($user)->delete("labels/{$label->id}");
+        $response = $this->actingAs($user)->delete(route('labels.destroy', $label));
 
-        $response->assertRedirect('/labels');
+        $response->assertRedirect(route('labels.index'));
         $this->assertDatabaseHas('labels', ['id' => $label->id]);
     }
 
@@ -128,22 +129,22 @@ class LabelTest extends TestCase
         $data = ['name' => ''];
 
         $response = $this->actingAs($user)
-            ->from('/labels/create')
-            ->post('labels', $data);
-        $response->assertRedirect('/labels/create');
+            ->from(route('labels.create'))
+            ->post(route('labels.store'), $data);
+        $response->assertRedirect(route('labels.create'));
         $response->assertSessionHasErrors(['name' => 'Это обязательное поле']);
 
         $data = ['name' => 'Название метки'];
 
-        $response = $this->actingAs($user)->post('labels', $data);
-        $response->assertRedirect('/labels');
+        $response = $this->actingAs($user)->post(route('labels.store'), $data);
+        $response->assertRedirect(route('labels.index'));
 
         $data = ['name' => 'Название метки'];
 
         $response = $this->actingAs($user)
-            ->from('/labels/create')
-            ->post('labels', $data);
-        $response->assertRedirect('/labels/create');
+            ->from(route('labels.create'))
+            ->post(route('labels.store'), $data);
+        $response->assertRedirect(route('labels.create'));
         $response->assertSessionHasErrors(['name' => 'Метка с таким именем уже существует']);
     }
 }
