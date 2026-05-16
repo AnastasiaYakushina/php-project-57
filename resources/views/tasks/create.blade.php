@@ -6,7 +6,7 @@
 
         <div class="flex flex-col gap-2">
             {{ html()->label(__('Название'), 'name')->class('text-sm font-medium text-gray-700') }}
-            {{ html()->text('name')->value(old('name'))->class('w-full px-3 py-2 text-sm bg-white border border-gray-300 rounded-none focus:outline-none focus:border-emerald-800 focus:ring-0 text-black') }}
+            {{ html()->text('name')->class('w-full px-3 py-2 text-sm bg-white border border-gray-300 rounded-none focus:outline-none focus:border-emerald-800 focus:ring-0 text-black') }}
 
             @error('name')
             <span class="text-xs text-red-600 mt-1">{{ $message }}</span>
@@ -15,7 +15,7 @@
 
         <div class="flex flex-col gap-2">
             {{ html()->label(__('Описание'), 'description')->class('text-sm font-medium text-gray-700') }}
-            {{ html()->textarea('description')->value(old('description'))->class('w-full px-3 py-2 text-sm bg-white border border-gray-300 rounded-none focus:outline-none focus:border-emerald-800 focus:ring-0 text-black min-h-[100px]') }}
+            {{ html()->textarea('description')->class('w-full px-3 py-2 text-sm bg-white border border-gray-300 rounded-none focus:outline-none focus:border-emerald-800 focus:ring-0 text-black min-h-[100px]') }}
 
             @error('description')
             <span class="text-xs text-red-600 mt-1">{{ $message }}</span>
@@ -26,7 +26,6 @@
             {{ html()->label(__('Статус'), 'status_id')->class('text-sm font-medium text-gray-700') }}
             {{ html()->select('status_id', $taskStatuses->pluck('name', 'id'))
                     ->placeholder('-- ' . __('Выберите статус') . ' --')
-                    ->value(old('status_id'))
                     ->class('w-full px-3 py-2 text-sm bg-white border border-gray-300 rounded-none focus:outline-none focus:border-emerald-800 focus:ring-0 text-black cursor-pointer') }}
 
             @error('status_id')
@@ -38,7 +37,6 @@
             {{ html()->label(__('Исполнитель'), 'assigned_to_id')->class('text-sm font-medium text-gray-700') }}
             {{ html()->select('assigned_to_id', $users->pluck('name', 'id'))
                     ->placeholder('-- ' . __('Выберите исполнителя') . ' --')
-                    ->value(old('assigned_to_id'))
                     ->class('w-full px-3 py-2 text-sm bg-white border border-gray-300 rounded-none focus:outline-none focus:border-emerald-800 focus:ring-0 text-black cursor-pointer') }}
 
             @error('assigned_to_id')

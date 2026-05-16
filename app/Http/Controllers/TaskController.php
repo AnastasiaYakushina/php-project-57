@@ -66,8 +66,9 @@ class TaskController extends Controller
             'status_id.required' => 'Это обязательное поле',
         ]);
 
-        $task = new Task();
-        $task = Auth::user()->createdTasks()->create($validated);
+        $task = new Task($validated);
+        $task->createdBy()->associate(Auth::user());
+        $task->save();
 
         $task->labels()->sync($request->input('labels', []));
 

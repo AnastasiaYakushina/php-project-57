@@ -4,6 +4,10 @@ namespace App\Providers;
 
 use App\Models\Task;
 use App\Policies\TaskPolicy;
+use App\Models\TaskStatus;
+use App\Policies\TaskStatusPolicy;
+use App\Models\Label;
+use App\Policies\LabelPolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 
 class AuthServiceProvider extends ServiceProvider
