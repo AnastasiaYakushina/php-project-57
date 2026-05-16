@@ -47,5 +47,8 @@
                 </tbody>
             </table>
         </div>
+        <div class="mt-6">
+            {{ $taskStatuses->appends(request()->query())->links() }}
+        </div>
     </div>
 </x-app-layout>

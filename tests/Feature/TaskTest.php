@@ -208,24 +208,24 @@ class TaskTest extends TestCase
 
     public function testTaskFilters(): void
     {
-        $creator = User::factory()->create();
-        $executor = User::factory()->create();
+        $createdBy = User::factory()->create();
+        $assignedTo = User::factory()->create();
         $status = TaskStatus::factory()->create();
 
         Task::factory()->create([
             'name' => 'Нужная задача',
             'status_id' => $status->id,
-            'created_by_id' => $creator->id,
-            'assigned_to_id' => $executor->id,
+            'created_by_id' => $createdBy->id,
+            'assigned_to_id' => $assignedTo->id,
         ]);
 
         Task::factory()->create(['name' => 'Лишняя задача']);
 
-        $response = $this->actingAs($creator)->get('/tasks?' . http_build_query([
+        $response = $this->actingAs($createdBy)->get('/tasks?' . http_build_query([
             'filter' => [
                 'status_id' => $status->id,
-                'created_by_id' => $creator->id,
-                'assigned_to_id' => $executor->id,
+                'created_by_id' => $createdBy->id,
+                'assigned_to_id' => $assignedTo->id,
             ]
         ]));
 

@@ -21,11 +21,11 @@
                     </tr>
                     <tr class="hover:bg-[#faf9f6]">
                         <th scope="row" class="px-6 py-4 font-medium text-gray-600 bg-[#faf9f6] border-r border-gray-300">{{ __('Автор') }}</th>
-                        <td class="px-6 py-4">{{ $task->creator->name }}</td>
+                        <td class="px-6 py-4">{{ $task->createdBy->name }}</td>
                     </tr>
                     <tr class="hover:bg-[#faf9f6]">
                         <th scope="row" class="px-6 py-4 font-medium text-gray-600 bg-[#faf9f6] border-r border-gray-300">{{ __('Исполнитель') }}</th>
-                        <td class="px-6 py-4">{{ $task->executor?->name ?? '—' }}</td>
+                        <td class="px-6 py-4">{{ $task->assignedTo?->name ?? '—' }}</td>
                     </tr>
                     <tr class="hover:bg-[#faf9f6]">
                         <th scope="row" class="px-6 py-4 font-medium text-gray-600 bg-[#faf9f6] border-r border-gray-300">{{ __('Метки') }}</th>

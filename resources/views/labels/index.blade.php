@@ -50,5 +50,8 @@
                 </tbody>
             </table>
         </div>
+        <div class="mt-6">
+            {{ $labels->appends(request()->query())->links() }}
+        </div>
     </div>
 </x-app-layout>

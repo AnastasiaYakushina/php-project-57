@@ -78,8 +78,8 @@
                             <a href="{{ route('tasks.show', $task) }}" class="hover:underline">{{ $task->name }}</a>
                         </td>
                         <td class="px-4 py-4 border-r border-gray-300 text-left">{{ $task->status->name }}</td>
-                        <td class="px-4 py-4 border-r border-gray-300 text-left">{{ $task->executor?->name ?? '—' }}</td>
-                        <td class="px-4 py-4 border-r border-gray-300 text-left">{{ $task->creator->name }}</td>
+                        <td class="px-4 py-4 border-r border-gray-300 text-left">{{ $task->assignedTo?->name ?? '—' }}</td>
+                        <td class="px-4 py-4 border-r border-gray-300 text-left">{{ $task->createdBy->name }}</td>
                         <td class="px-4 py-4 border-r border-gray-300 text-left">{{ $task->created_at->format('d.m.Y') }}</td>
 
                         <td class="px-4 py-4 text-left">
@@ -107,6 +107,9 @@
                     @endforeach
                 </tbody>
             </table>
+        </div>
+        <div class="mt-6">
+            {{ $tasks->appends(request()->query())->links() }}
         </div>
     </div>
 </x-app-layout>

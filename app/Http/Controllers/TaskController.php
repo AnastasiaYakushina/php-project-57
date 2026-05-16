@@ -29,8 +29,8 @@ class TaskController extends Controller
                 AllowedFilter::exact('created_by_id'),
                 AllowedFilter::exact('assigned_to_id')
             )
-            ->with(['status', 'creator', 'executor', 'labels'])
-            ->get();
+            ->with(['status', 'createdBy', 'assignedTo', 'labels'])
+            ->paginate(10);
 
         $taskStatuses = TaskStatus::all();
         $users = User::all();
